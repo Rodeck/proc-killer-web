@@ -1,18 +1,9 @@
-# vuex-playlist
+# procrastination-killer-web
 
-> A Vue.js project
+## About
+This is frontend web app written for procrastination killer app.
 
-## Build Setup
+Framework used is Vue + Vuex + Vue material design.
 
-``` bash
-# install dependencies
-npm install
+Note that this is early developement stage.
 
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-```
-
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).

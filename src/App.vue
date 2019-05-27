@@ -6,6 +6,7 @@
 
 <script>
 import Home from './components/HomeComponent.vue'
+import '../Viewport.scss'
 
 export default {
     name: 'app',

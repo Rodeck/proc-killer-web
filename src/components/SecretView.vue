@@ -1,7 +1,5 @@
 <template>
     <div>
-        <h1> Hello from secret component!</h1>
-        <span>Login status is {{ state }}</span>
         <main-view></main-view>
     </div>
 </template>

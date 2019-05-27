@@ -1,23 +1,22 @@
 <template>
     <div>
-        <div class="d-flex flex-row-reverse dark-nav">
-            <button v-on:click="changeLogin" class="btn btn-secondary">{{ loginButtonText }}</button>
-            <span v-if="showSecret" class="username">Hello {{ currentUser }}</span>
-        </div>
-        <div class="row content">
-            <div class="col-sm-10 offset-sm-1">
-                <transition name="fade">
-                    <login-component class="loginApplet" v-if="showLoginApplet"></login-component>
-                </transition>
-                <transition name="fade">
-                    <secret-component v-if="showSecret"></secret-component>
-                </transition>
-                <transition name="fade">
-                    <div class="d-flex justify-content-center" v-if="showPublicPage">
-                        <index-public></index-public>
-                    </div>
-                </transition>
+        <md-toolbar md-theme="default" class="md-primary md-layout md-alignment-center-space-between">
+            <h1 class="md-layout-item md-size-75">Hello</h1>
+            <div class="md-layout-item md-size-25 align-right md-layout md-gutter md-alignment-center-right">
+                <md-button class="md-accent" md-theme="default" v-on:click="changeLogin">{{ loginButtonText }}</md-button>
+                <span v-if="showSecret" class="username">Hello {{ currentUser }}</span>
             </div>
+        </md-toolbar>
+        <div class="row content">
+            <transition name="fade">
+                <login-component class="loginApplet" v-if="showLoginApplet"></login-component>
+            </transition>
+
+            <main-view v-if="showSecret"></main-view>
+
+            <transition name="fade">
+                    <index-public  v-if="showPublicPage"></index-public>
+            </transition>
         </div>
     </div>
 </template>
@@ -26,12 +25,14 @@
 import Login from "./LoginComponent.vue"
 import SecretView from "./SecretView.vue"
 import PublicMainPage from "./PublicMainPage.vue"
+import MainView from "./MainViewComponent.vue"
 
 export default {
     components: {
         'login-component': Login,
         'secret-component': SecretView,
-        'index-public': PublicMainPage
+        'index-public': PublicMainPage,
+        'main-view': MainView
     },
     data() {
         return {
@@ -64,7 +65,13 @@ export default {
                 this.$store.dispatch("displayLoginWindow");
             else
                 this.$store.dispatch("logOut");
+        },
+        mockLogin: function() {
+            this.$store.dispatch("mockLogin");
         }
+    },
+    mounted: function() {
+        this.mockLogin();
     }
 }
 </script>
@@ -73,6 +80,7 @@ export default {
 .dark-nav{
     background-color: rgb(53, 53, 53);
     padding: 20px;
+    margin-right: 0px;
 }
 
 .content{

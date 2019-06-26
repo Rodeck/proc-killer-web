@@ -37,7 +37,6 @@ export default {
             description: "",
         }
     },
-    props: ['date'],
     computed: {
         isLoading() {
             return this.$store.getters.isAddingTodo;
@@ -47,6 +46,9 @@ export default {
         },
         errorMessage() {
             return this.$store.state.addingTodoErrorMessage;
+        },
+        date() {
+            return this.$store.getters.pickedDayDate;
         }
     },
     methods: {

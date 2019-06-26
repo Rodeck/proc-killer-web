@@ -1,54 +1,30 @@
 <template>
     <div class="md-content view-content">
         <transition name="fade">
-            <add-todo v-if="showAddTodoWindow" :date="date"></add-todo>
+            <add-todo v-if="showAddTodoWindow"></add-todo>
         </transition>
-        <div class="md-layout md-gutter md-alignment-center-space-around">
-            <md-card class="md-layout-item md-size-30">
+        <div class="md-layout md-alignment-center main-layout">
+            <md-card class="md-layout-item md-size-20">
                 <md-card-header>
                     <div class="md-title">Recent rewards</div>
                 </md-card-header>
                 <md-card-content>
-                    <md-list class="md-dense">
-                        <md-list-item>
-                            <md-icon class="md-primary">email</md-icon>
-                            <span class="md-list-item-text">Todo completed</span>
-                            <md-button class="md-icon-button md-list-action">
-                            <md-badge class="md-square" md-content="+10" />
-                            </md-button>
-                        </md-list-item>
-
-                        <md-list-item>
-                            <md-icon class="md-primary">email</md-icon>
-                            <span class="md-list-item-text">Daily login reward</span>
-                            <md-button class="md-icon-button md-list-action">
-                            <md-badge class="md-square" md-content="+50" />
-                            </md-button>
-                        </md-list-item>
-
-                        <md-list-item>
-                            <md-icon class="md-primary">email</md-icon>
-                            <span class="md-list-item-text">Todo completed</span>
-                            <md-button class="md-icon-button md-list-action">
-                            <md-badge class="md-square" md-content="+50" />
-                            </md-button>
-                        </md-list-item>
-
-                        <md-list-item>
-                            <md-icon class="md-primary">email</md-icon>
-                            <span class="md-list-item-text">Completition streak.</span>
-                            <md-button class="md-icon-button md-list-action">
-                            <md-badge class="md-square" md-content="+150" />
-                            </md-button>
-                        </md-list-item>
-                    </md-list>
+                    <mini-rewards></mini-rewards>
+                </md-card-content>
+            </md-card>
+            <md-card class="md-layout-item md-size-15">
+                <md-card-header>
+                    <div class="md-title">Account</div>
+                </md-card-header>
+                <md-card-content>
+                    <account></account>
                 </md-card-content>
             </md-card>
             <md-card class="md-layout-item md-size-60 clostest-wrapper">
                 <md-card-header>
                     <div class="md-title">Clostest todos</div>
                 </md-card-header>
-                <md-card-content class="md-layout md-gutter" v-show="isDataLoaded && filledDays">
+                <md-card-content class="md-layout md-gutter" v-if="isDataLoaded && filledDays">
                     <div class="md-layout-item md-size-33">
                         <clostest-todo v-bind:day="yesterday" v-bind:key="viewKey"></clostest-todo>
                     </div>
@@ -62,14 +38,7 @@
                     </div>
                 </md-card-content>
                 <md-card-content v-show="!isDataLoaded || !filledDays">
-                    <div class="loading-wrapper">
-                        <div class="loading-title">
-                            Loading...
-                        </div>
-                        <div class="loading-spinner">
-                            <md-progress-spinner md-mode="indeterminate"></md-progress-spinner>
-                        </div>
-                    </div>
+                    <loading-bar></loading-bar>
                 </md-card-content>
             </md-card>
             <md-card class="md-layout-item md-size-30 second-row">
@@ -77,7 +46,7 @@
                     <div class="md-title">Statistics</div>
                 </md-card-header>
                 <md-card-content class="md-layout md-gutter">
-                    
+                    <mini-charts></mini-charts>
                 </md-card-content>
             </md-card>
             <md-card class="md-layout-item md-size-60 second-row">
@@ -163,12 +132,20 @@ import * as moment from 'moment';
 import TodoView from './TodoView.vue'
 import AddTodo from './AddTodo.vue'
 import ClostestTodo from './ClostestTodo.vue'
+import MiniCharts from './MiniChartsComponent.vue'
+import MiniRewards from './MiniRewardsComponent.vue'
+import Account from './AccountComponent.vue'
+import Loading from './LoadingBar.vue'
 
 export default {
     components: {
         'todo': TodoView,
         'add-todo': AddTodo,
-        'clostest-todo': ClostestTodo
+        'clostest-todo': ClostestTodo,
+        'mini-charts': MiniCharts,
+        'mini-rewards': MiniRewards,
+        'loading-bar': Loading,
+        'account': Account
     },
     data() {
         return {
@@ -207,6 +184,7 @@ export default {
     },
     watch: {
         isDataLoaded: function(val) {
+            console.log("Fill days");
             this.fillDays();
         }
     },
@@ -214,7 +192,6 @@ export default {
         calcColor(day) {
             
             var percent = day/31;
-            console.log(day);
             var value = 100 + (80 - (80 * percent));
             return 'rgb(' + value +', ' + value + ', ' + value + ')';
         },
@@ -310,10 +287,10 @@ export default {
             }
 
             this.allDays = days;
-            this.filledDays = true;
             this.today = this.$store.state.today;
             this.yesterday = this.$store.state.yesterday;
             this.tomorrow = this.$store.state.tomorrow;
+            this.filledDays = true;
         }
     },
     mounted: function() {
@@ -324,17 +301,8 @@ export default {
 
 <style scoped>
 
-.loading-wrapper {
-    margin: auto;
-    display: table;
-}
-
-.loading-spinner {
-    display: table;
-}
-
-.loading-title {
-    display: table;
+.main-layout > .md-layout-item {
+    margin: 10px;
 }
 
 .clostest-wrapper {
@@ -423,6 +391,9 @@ export default {
 
 .currentDay {
     background-color: #919090;
+    -webkit-box-shadow: 0px 0px 24px 0px rgba(84,194,74,1);
+    -moz-box-shadow: 0px 0px 24px 0px rgba(84,194,74,1);
+    box-shadow: 0px 0px 24px 0px rgba(84,194,74,1);
 }
 
 .week-day-header {

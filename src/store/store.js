@@ -22,6 +22,17 @@ function authHeader() {
     }
 }
 
+function getUserId(context) {
+    if (context && context.state.user)
+    {
+        return context.state.user.id;
+    }
+    else if (localStorage.getItem('userId'))
+    {
+        return localStorage.getItem('userId')
+    }
+}
+
 export const store = new Vuex.Store({
     strict: true,
     state: {
@@ -30,6 +41,7 @@ export const store = new Vuex.Store({
         isLoged: false,
         user: null,
         loadingDataState: "notLoaded",
+        loadingEventsState: "notLoaded",
         showAddTodoWindow: false,
         addingTodoState: 'idle', // idle, inProgress, failed,
         addingTodoErrorMessage: "",
@@ -52,7 +64,9 @@ export const store = new Vuex.Store({
             return state.loginStatus == "loggedIn";
         },
         userName: state => {
-            return state.user.username || "None";
+            if (state.use)   
+                return state.user.username || "None";
+            return "None";
         },
         isLoadingData: state => {
             return state.loadingDataState == "loading";
@@ -60,6 +74,13 @@ export const store = new Vuex.Store({
         isDataLoaded: state => {
             return state.loadingDataState != "loading" && state.loadingDataState != 'notLoaded';
         },
+        isLoadingEvents: state => {
+            return state.loadingEventsState == "loading";
+        },
+        isEventsLoaded: state => {
+            return state.loadingEventsState != "loading" && state.loadingEventsState != 'notLoaded';
+        },
+        getEvents: state => state.events,
         isAddingTodo: state => {
             return state.addingTodoState == 'inProgress';
         },
@@ -68,6 +89,47 @@ export const store = new Vuex.Store({
         },
         getCallendar: state => {
             return state.callendar;
+        },
+        pickedDayDate: state => {
+            if(state.pickedDay)
+                return state.pickedDay.date;
+            else
+                return null;
+        },
+        isLogged: state => {
+            return state.isLoged;
+        },
+        user: state => {
+            return {
+                username: state.user.username,
+                points: state.user.currentState.points,
+                currentLoginStreak: state.user.currentState.currentLoginStreak,
+                longestLoginStreak: state.user.currentState.longestLoginStreak,
+                todosCompleted: state.user.currentState.totalTodosCompleted,
+            }
+        },
+        pointsPerDay: state => {
+
+            const options = {
+                method: 'GET',
+                headers : authHeader(),
+                url: config.api + '/Statistics/pointsPerDay/' + getUserId()
+            };
+
+            axios(options)
+            .then(function (response) {
+                if (response.data.result)
+                {
+                    return response.data.result
+                }
+                else
+                {
+                    console.log("Error.");
+                }
+            })
+            .catch(function (error) {
+                console.log("Error.");
+            });
         }
     },
     mutations: {
@@ -85,11 +147,21 @@ export const store = new Vuex.Store({
         saveToken: (state, token) => {
             localStorage.setItem('token', token);
         },
+        saveLoggedUser: (state, userData) => {
+            localStorage.setItem('token', userData.user.token);
+            localStorage.setItem('userId', userData.user.id);
+            state.isLoged = true;
+            state.user = userData.user;
+            state.loginStatus = 'loggedIn';
+        },
         setUser: (state, user) => {
             state.user = user;
         },
         startLoadingData: (state) => {
             state.loadingDataState = 'loading';
+        },
+        startLoadingEvents: (state) => {
+            state.loadingEventsState = 'loading';
         },
         loadingDataSuccess: (state, data) => { 
             console.log("Refreshing data.");
@@ -100,7 +172,7 @@ export const store = new Vuex.Store({
             })[0];
 
             state.today = today == undefined ? {
-                date: moment().subtract(1, 'days').format("YYYY-MM-DD"),
+                date: moment().format("YYYY-MM-DD"),
                 todos: new Array(),
                 allCompleted: false
             }: today;
@@ -130,7 +202,7 @@ export const store = new Vuex.Store({
             })[0];
 
             state.tomorrow = tomorrow == undefined ? {
-                date: moment().subtract(1, 'days').format("YYYY-MM-DD"),
+                date: moment().add(1, 'days').format("YYYY-MM-DD"),
                 todos: new Array(),
                 allCompleted: false
             }: tomorrow; 
@@ -144,6 +216,11 @@ export const store = new Vuex.Store({
             console.log("Update view key. Today is: " + JSON.stringify(state.today));
             state.viewKey += 1;
             console.log("End refreshing data.");
+        },
+        loadingEventsSuccess: (state, data) => { 
+
+            state.events = data;
+            state.loadingEventsState = 'loaded';
         },
         displayAddTodoWindow: (state) => {
             state.showAddTodoWindow = true;
@@ -252,10 +329,9 @@ export const store = new Vuex.Store({
                 if (response.data.result.token)
                 {
                     console.log('Udalo sie zalogowac. ' + response.data.result.token);
-                    context.commit('saveToken', response.data.result.token);
-                    context.commit('setUser', response.data.result);
-                    context.commit('changeLoginStatus', "loggedIn");
-                    context.commit('logIn');
+                    context.commit('saveLoggedUser', {
+                        user: response.data.result
+                    });
                 }
                 else
                 {
@@ -291,7 +367,7 @@ export const store = new Vuex.Store({
             const options = {
                 method: 'GET',
                 headers : authHeader(),
-                url: config.api + '/Users/getCallendar/' + context.state.user.id
+                url: config.api + '/Users/getCallendar/' + getUserId(context)
             };
 
             axios(options)
@@ -299,6 +375,7 @@ export const store = new Vuex.Store({
                 if (response.data.result)
                 {
                     context.commit('loadingDataSuccess', response.data.result);
+                    context.dispatch('loadEvents');
                 }
                 else
                 {
@@ -311,12 +388,40 @@ export const store = new Vuex.Store({
 
             console.log("End downloading data.");
         },
+        loadEvents: (context) => {
+            context.commit('startLoadingEvents');
+            
+            console.log("Starting downloading events.");
+
+            const options = {
+                method: 'GET',
+                headers : authHeader(),
+                url: config.api + '/Users/getEvents/' + getUserId(context)
+            };
+
+            axios(options)
+            .then(function (response) {
+                if (response.data.result)
+                {
+                    context.commit('loadingEventsSuccess', response.data.result);
+                }
+                else
+                {
+                    context.commit('loadingEventsFailed');
+                }
+            })
+            .catch(function (error) {
+                context.commit('loadingEventsFailed');
+            });
+
+            console.log("End downloading data.");
+        },
         markCompleted: (context, id) => {
             const options = {
                 method: 'POST',
                 headers : authHeader(),
                 url: config.api + '/Todo/MarkCompleted',
-                data: {UserId: context.state.user.id, Id: id}
+                data: {UserId: getUserId(context), Id: id}
             };
 
             axios(options)
@@ -333,7 +438,7 @@ export const store = new Vuex.Store({
                 method: 'POST',
                 headers : authHeader(),
                 url: config.api + '/Todo/Restore',
-                data: {UserId: context.state.user.id, Id: id}
+                data: {UserId: getUserId(context), Id: id}
             };
 
             axios(options)
@@ -354,13 +459,14 @@ export const store = new Vuex.Store({
         addTodo: (context, payload) => {
             context.commit('startAddingTodo');
 
-            var apiDate = moment(payload.date, "DD-MM-YYYY").format("YYYY-MM-DD[T00:00:00.00]");
+            console.log(payload.date);
+            var apiDate = moment(payload.date, "YYYY-MM-DD").format("YYYY-MM-DD[T00:00:00.00]");
 
             const options = {
                 method: 'POST',
                 headers : authHeader(),
                 url: config.api + '/Todo/AddTodo',
-                data: {Name: payload.name, Description: payload.description, UserId: context.state.user.id, TargetDate: apiDate}
+                data: {Name: payload.name, Description: payload.description, UserId: getUserId(context), TargetDate: apiDate}
             };
 
             axios(options)
@@ -419,7 +525,7 @@ export const store = new Vuex.Store({
             });
         },
         mockLogin: (context) => {
-            context.dispatch('logIn', { username: "test", password: "123456"});
+            //context.dispatch('logIn', { username: "test", password: "123456"});
         }
     }
 });

@@ -1,13 +1,14 @@
 <template>
     <div>
         <md-toolbar md-theme="default" class="md-primary md-layout md-alignment-center-space-between">
-            <h1 class="md-layout-item md-size-75">Hello</h1>
+            <h1 class="md-layout-item md-size-75">Procrastination killer</h1>
             <div class="md-layout-item md-size-25 align-right md-layout md-gutter md-alignment-center-right">
                 <md-button class="md-accent" md-theme="default" v-on:click="changeLogin">{{ loginButtonText }}</md-button>
                 <span v-if="showSecret" class="username">Hello {{ currentUser }}</span>
             </div>
         </md-toolbar>
         <div class="row content">
+            <router-view></router-view>
             <transition name="fade">
                 <login-component class="loginApplet" v-if="showLoginApplet"></login-component>
             </transition>
@@ -36,6 +37,10 @@ export default {
     },
     data() {
         return {
+            contentStyle: {
+                backgroundColor: 'red'
+            },
+            background: '../assets/motivational-bg.png' 
         }
     },
     computed: {
@@ -56,7 +61,7 @@ export default {
         },
         currentUser(){
             return this.$store.getters.userName;
-        },
+        }
     },
     methods: {
         changeLogin: function() {
@@ -87,7 +92,8 @@ export default {
     height: -webkit-fill-available;
     background-color: rgb(114, 116, 117);
     color: aliceblue;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url("../assets/motivational-bg.png");
 }
 
 .loginApplet{

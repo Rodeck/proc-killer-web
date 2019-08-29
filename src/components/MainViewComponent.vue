@@ -1,55 +1,13 @@
 <template>
     <div class="md-content view-content">
-        <transition name="fade">
+         <transition name="fade">
             <add-todo v-if="showAddTodoWindow"></add-todo>
         </transition>
-        <div class="md-layout md-alignment-center main-layout">
-            <md-card class="md-layout-item md-size-20">
-                <md-card-header>
-                    <div class="md-title">Recent rewards</div>
-                </md-card-header>
-                <md-card-content>
-                    <mini-rewards></mini-rewards>
-                </md-card-content>
-            </md-card>
-            <md-card class="md-layout-item md-size-15">
-                <md-card-header>
-                    <div class="md-title">Account</div>
-                </md-card-header>
-                <md-card-content>
-                    <account></account>
-                </md-card-content>
-            </md-card>
-            <md-card class="md-layout-item md-size-60 clostest-wrapper">
-                <md-card-header>
-                    <div class="md-title">Clostest todos</div>
-                </md-card-header>
-                <md-card-content class="md-layout md-gutter" v-if="isDataLoaded && filledDays">
-                    <div class="md-layout-item md-size-33">
-                        <clostest-todo v-bind:day="yesterday" v-bind:key="viewKey"></clostest-todo>
-                    </div>
-
-                    <div class="md-layout-item md-size-33">
-                        <clostest-todo v-bind:day="today" v-bind:key="viewKey"></clostest-todo>
-                    </div>
-
-                    <div class="md-layout-item md-size-33">
-                        <clostest-todo v-bind:day="tomorrow" v-bind:key="viewKey"></clostest-todo>
-                    </div>
-                </md-card-content>
-                <md-card-content v-show="!isDataLoaded || !filledDays">
-                    <loading-bar></loading-bar>
-                </md-card-content>
-            </md-card>
-            <md-card class="md-layout-item md-size-30 second-row">
-                <md-card-header>
-                    <div class="md-title">Statistics</div>
-                </md-card-header>
-                <md-card-content class="md-layout md-gutter">
-                    <mini-charts></mini-charts>
-                </md-card-content>
-            </md-card>
-            <md-card class="md-layout-item md-size-60 second-row">
+        <div class="md-layout md-alignment-center">
+            <div class="md-layout-item md-size-30" id="statistics">
+                <mini-charts v-if="chartSize != null" :size="chartSize"></mini-charts>
+            </div>
+            <md-card class="md-layout-item md-size-65">
                 <md-card-content class="md-layout md-gutter">
                     <div class="md-layout-item md-size-100">
                         <div class="md-layout md-gutter md-alignment-center-center">
@@ -131,21 +89,16 @@ import * as Day from '../types/Day'
 import * as moment from 'moment';
 import TodoView from './TodoView.vue'
 import AddTodo from './AddTodo.vue'
-import ClostestTodo from './ClostestTodo.vue'
 import MiniCharts from './MiniChartsComponent.vue'
-import MiniRewards from './MiniRewardsComponent.vue'
-import Account from './AccountComponent.vue'
+
 import Loading from './LoadingBar.vue'
 
 export default {
     components: {
         'todo': TodoView,
         'add-todo': AddTodo,
-        'clostest-todo': ClostestTodo,
         'mini-charts': MiniCharts,
-        'mini-rewards': MiniRewards,
-        'loading-bar': Loading,
-        'account': Account
+        'loading-bar': Loading
     },
     data() {
         return {
@@ -156,7 +109,8 @@ export default {
             filledDays: false,
             today: Object,
             yesterday: Object,
-            tomorrow: Object
+            tomorrow: Object,
+            chartSize: Number
         }
     },
     computed: {
@@ -170,7 +124,7 @@ export default {
             return this.$store.getters.isDataLoaded
         },
         showAddTodoWindow(){
-            return this.$store.state.showAddTodoWindow;
+            return this.$store.getters.showAddTodoWindow;
         },
         showDeleteTodoWindow(){
             return this.$store.state.showDeleteTodoWindow;
@@ -249,8 +203,6 @@ export default {
                 })
             }
 
-            console.log(this.$store.state.callendar);
-
             for(var no = 1; no <=daysInMonth; no++) {
                 
                 var dayDate = moment(startOfMonth).add('days', no-1);
@@ -295,11 +247,16 @@ export default {
     },
     mounted: function() {
         this.$store.dispatch('loadData');
+        this.chartSize = document.getElementById('statistics').clientWidth - 60;
     }
 }
 </script>
 
 <style scoped>
+
+.main-layout {
+    padding-top: 5%;
+}
 
 .main-layout > .md-layout-item {
     margin: 10px;
@@ -410,10 +367,6 @@ export default {
     box-shadow: 0px 0px 17px 0px rgba(0,0,0,0.75);
 }
 
-.second-row {
-    margin-top: 0.5%;
-}
-
 .view-content {
     width: 100%;
     margin-top: 0.5%;
@@ -458,9 +411,6 @@ box-shadow: -10px 0px 26px 0px rgba(0,0,0,0.75);
     text-align: center;
 }
 
-.content_ {
-    height: 550px;
-}
 .main-view-container {
     height: 75%;
     background-color: rgb(90, 68, 40);

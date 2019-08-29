@@ -1,19 +1,28 @@
 <template>
   <div id="app">
-    <div>
-        <md-toolbar md-theme="default" class="md-primary md-layout md-alignment-center-space-between">
-            <h1 class="md-layout-item md-size-75">Procrastination killer</h1>
-            <div class="md-layout-item md-size-25 align-right md-layout md-gutter md-alignment-center-right">
-                <md-button class="md-accent" md-theme="default" v-on:click="changeLogin">{{ loginButtonText }}</md-button>
-                <span v-if="showSecret" class="username">Hello {{ currentUser }}</span>
+    <md-toolbar md-theme="default" class="md-primary md-layout md-alignment-center-space-between">
+        <div class="md-layout-item md-size-70 align-left md-layout md-gutter">
+            <div class="md-layout-item md-size-35 align-left md-layout md-gutter">
+                <h1>Procrastination killer</h1>
             </div>
-        </md-toolbar>
-        <div class="row content">
-            <router-view></router-view>
-            <transition name="fade">
-                <login-component class="loginApplet" v-if="showLoginApplet"></login-component>
-            </transition>
+            <div class="md-layout-item md-size-65 align-left md-layout md-gutter md-alignment-center-left">
+                <router-link to="/home"><md-button>Home</md-button></router-link>
+                <router-link to="/main"><md-button>Dashboard</md-button></router-link>
+                <router-link to="/simpleView"><md-button>Simple view</md-button></router-link>
+            </div>
         </div>
+        <div class="md-layout-item md-size-30 align-right md-layout md-gutter md-alignment-center-right">
+            <md-button class="md-accent" md-theme="default" v-on:click="changeLogin">{{ loginButtonText }}</md-button>
+            <span v-if="showSecret" class="username">Hello {{ currentUser }}</span>
+        </div>
+    </md-toolbar>
+    <div class="content">
+        <transition name="fade" mode="out-in">
+            <router-view class="view"></router-view>
+        </transition>
+        <transition name="fade">
+            <login-component class="loginApplet" v-if="showLoginApplet"></login-component>
+        </transition>
     </div>
   </div>
 </template>
@@ -60,20 +69,18 @@ export default {
         showSecret: function(value) {
             if (value)
             {
-                console.log('go to Main');
                 this.$router.push('Main');
             }
             else
             {
-                console.log('go to Home');
                 this.$router.push('Home');
             }
         }
     },
     methods: {
         changeLogin: function() {
-            var currentState = this.$store.state.loginStatus;
-            if (currentState == "notLogged")
+            var isLogged = this.$store.getters.isLogged;
+            if (!isLogged)
                 this.$store.dispatch("displayLoginWindow");
             else
                 this.$store.dispatch("logOut");
@@ -95,6 +102,10 @@ body{
     color: #555;
 }
 
+.view {
+    height: -webkit-fill-available;
+}
+
 .dark-nav{
     background-color: rgb(53, 53, 53);
     padding: 20px;
@@ -107,6 +118,7 @@ body{
     color: aliceblue;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-image: url("./assets/motivational-bg.png");
+    margin-top: -15px;
 }
 
 .loginApplet{

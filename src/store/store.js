@@ -4,6 +4,8 @@ import axios from 'axios'
 import * as User from '../types/User'
 import * as moment from 'moment';
 import * as Day from '../types/Day'
+import createPersistedState from 'vuex-persistedstate'
+import * as Cookies from 'js-cookie'
 
 Vue.use(Vuex);
 
@@ -35,57 +37,117 @@ function getUserId(context) {
 
 export const store = new Vuex.Store({
     strict: true,
+    plugins: [
+        createPersistedState({
+          getState: (key) => Cookies.getJSON(key),
+          setState: (key, state) => Cookies.set(key, state, { expires: 3, secure: true })
+        })
+    ],
     state: {
         // notLogged, displayingLoginApplet, loggingIn, loggedIn
-        loginStatus: "notLogged",
-        isLoged: false,
         user: null,
-        loadingDataState: "notLoaded",
-        loadingEventsState: "notLoaded",
-        showAddTodoWindow: false,
-        addingTodoState: 'idle', // idle, inProgress, failed,
-        addingTodoErrorMessage: "",
         viewKey: 0,
         pickedDay: null,
         isDayPicked: false,
-        showDeleteTodoWindow: false,
-        deletingTodoState: 'idle',
-        deletingTodoErrorMessage: "",
-        todoToDelete: 0
+        appState: {
+            login: {
+                state: "notLogged",
+                message: null
+            },
+            register: {
+                state: "idle",
+                message: null
+            },
+            events: {
+                state: "notLoaded",
+                message: null
+            },
+            callendar: {
+                state: "notLoaded",
+                message: null
+            },
+            charts: {
+                pointsPerDay: { 
+                    state: "notLoaded",
+                    message: null
+                }
+            },
+            deletingTodo: {
+                state: "idle",
+                message: null,
+                todoToDelete: 0,
+                showWindow: false
+            },
+            addingTodo: {
+                state: "idle",
+                message: null,
+                showWindow: false
+            },
+            popup: {
+                show: false,
+                content: 'None'
+            }
+        }
     },
     getters: {
+        isRegistering(state) {
+            return state.appState.register.state == 'registering';
+        },
+        isRegisterError(state) {
+            return state.appState.register.state == 'error';
+        },
+        registerMessage(state) {
+            return state.appState.register.message;
+        },
+        isRegisterSuccess(state) {
+            return state.appState.register.state == 'success';
+        },
+        isChartLoaded(state) {
+            return chart => {
+                return state.appState.charts[chart].state == "loaded";
+            }
+        },
         showLoginButton: state => {
-            return state.loginStatus == "logginIn" || state.loginStatus == "notLogged" || state.loginStatus == "displayingLoginApplet";
+            return state.appState.login.state == "logginIn" 
+                || state.appState.login.state == "notLogged" 
+                || state.appState.login.state == "displayingLoginApplet";
         },
         showLoginApplet: state => {
-            return state.loginStatus == "displayingLoginApplet" || state.loginStatus == "logginIn";
+            return state.appState.login.state== "displayingLoginApplet" 
+                || state.appState.login.state == "logginIn"
+                || state.appState.login.state == "error";
         },
         showSecretApplet: state => {
-            return state.loginStatus == "loggedIn";
+            return state.appState.login.state == "loggedIn";
+        },
+        showAddTodoWindow: state => {
+            return state.appState.addingTodo.showWindow;
         },
         userName: state => {
-            if (state.use)   
+            if (state.user != null)   
                 return state.user.username || "None";
             return "None";
         },
         isLoadingData: state => {
-            return state.loadingDataState == "loading";
+            return state.appState.callendar.state == "loading";
         },
         isDataLoaded: state => {
-            return state.loadingDataState != "loading" && state.loadingDataState != 'notLoaded';
+            return state.appState.callendar.state != "loading" 
+                && state.appState.callendar.state != 'notLoaded';
         },
         isLoadingEvents: state => {
-            return state.loadingEventsState == "loading";
+            return state.appState.events.state == "loading";
         },
         isEventsLoaded: state => {
-            return state.loadingEventsState != "loading" && state.loadingEventsState != 'notLoaded';
+            return state.appState.events.state != "loading" 
+                && state.appState.events.state != 'notLoaded';
         },
         getEvents: state => state.events,
         isAddingTodo: state => {
-            return state.addingTodoState == 'inProgress';
+            return state.appState.addingTodo.state == 'inProgress';
         },
         showAddingTodoError: state => {
-            return state.addingTodoState == 'failed';
+            return state.appState.addingTodo.state == 'failed';
         },
         getCallendar: state => {
             return state.callendar;
@@ -97,9 +159,21 @@ export const store = new Vuex.Store({
                 return null;
         },
         isLogged: state => {
-            return state.isLoged;
+            return state.appState.login.state == "loggedIn";
+        },
+        registerError: state => {
+            return state.appState.register.state == "error";
+        },
+        isLoginError: state => {
+            return state.appState.login.state == "error";
+        },
+        loginErrorMessage: state => {
+            return state.appState.login.message;
         },
         user: state => {
+            if (state.user == null)
+                return null;
+
             return {
                 username: state.user.username,
                 points: state.user.currentState.points,
@@ -108,39 +182,40 @@ export const store = new Vuex.Store({
                 todosCompleted: state.user.currentState.totalTodosCompleted,
             }
         },
-        pointsPerDay: state => {
-
-            const options = {
-                method: 'GET',
-                headers : authHeader(),
-                url: config.api + '/Statistics/pointsPerDay/' + getUserId()
-            };
-
-            axios(options)
-            .then(function (response) {
-                if (response.data.result)
-                {
-                    return response.data.result
-                }
+        chartData: state => {
+            return chart => {
+                if (state.appState.charts[chart] != null)
+                    return state.appState.charts[chart].data;
                 else
-                {
-                    console.log("Error.");
-                }
-            })
-            .catch(function (error) {
-                console.log("Error.");
-            });
+                    return null;
+            }
+        },
+        showPopup: state => {
+            return state.appState.popup.show;
+        },
+        today: state => {
+            return state.today;
+        },
+        tomorrow: state => {
+            return state.tomorrow;
+        },
+        yesterday: state => {
+            return state.yesterday;
         }
     },
     mutations: {
         changeLoginStatus: (state, newStatus) => {
-            state.loginStatus = newStatus;
+            state.appState.login.state = newStatus;
+        },
+        loginError: (state, error) => {
+            state.appState.login.state = error.state;
+            state.appState.login.message = error.message;
         },
         logIn: (state) => {
-            state.isLoged = true;
+            state.appState.login.state = "logged";
         },
         logOut: (state) => {
-            state.isLoged = false;
+            state.appState.login.state = "notLogged";
             localStorage.setItem('token', null);
             state.user = null;
         },
@@ -150,21 +225,19 @@ export const store = new Vuex.Store({
         saveLoggedUser: (state, userData) => {
             localStorage.setItem('token', userData.user.token);
             localStorage.setItem('userId', userData.user.id);
-            state.isLoged = true;
+            state.appState.login.state = "loggedIn";
             state.user = userData.user;
-            state.loginStatus = 'loggedIn';
         },
         setUser: (state, user) => {
             state.user = user;
         },
         startLoadingData: (state) => {
-            state.loadingDataState = 'loading';
+            state.appState.callendar.state = 'loading';
         },
         startLoadingEvents: (state) => {
-            state.loadingEventsState = 'loading';
+            state.appState.events.state = 'loading';
         },
         loadingDataSuccess: (state, data) => { 
-            console.log("Refreshing data.");
             state.callendar = data;
 
             var today = data.filter( x => {
@@ -212,58 +285,60 @@ export const store = new Vuex.Store({
             else
                 state.tomorrow.pickedTodo = false;
 
-            state.loadingDataState = 'loaded';
-            console.log("Update view key. Today is: " + JSON.stringify(state.today));
+            console.log("Data loaded.");
+            state.appState.callendar.state = 'loaded';
             state.viewKey += 1;
-            console.log("End refreshing data.");
+        },
+        loadingChartDataSuccess: (state, data) => {
+            state.appState.charts[data.chart].data = data.data;
+            state.appState.charts[data.chart].state = "loaded";
         },
         loadingEventsSuccess: (state, data) => { 
-
             state.events = data;
-            state.loadingEventsState = 'loaded';
+            state.appState.events.state = 'loaded';
         },
         displayAddTodoWindow: (state) => {
-            state.showAddTodoWindow = true;
+            state.appState.addingTodo.showWindow = true;
         },
         hideAddTodoWindow: (state) => {
-            state.showAddTodoWindow = false;
-            state.addingTodoErrorMessage = "";
-            state.addingTodoState = 'idle';
+            state.appState.addingTodo.showWindow = false;
+            state.appState.addingTodo.message = "";
+            state.appState.addingTodo.state = 'idle';
         },
         startAddingTodo: (state) => {
-            state.addingTodoState = 'inProgress';
+            state.appState.addingTodo.state = 'inProgress';
         },
         endAddingTodoSuccess: (state) => {
-            state.addingTodoState = 'idle';
+            state.appState.addingTodo.state = 'idle';
         },
         endAddingTodoError: (state, message) => {
-            state.addingTodoState = 'failed';
-            state.addingTodoErrorMessage = message;
+            state.appState.addingTodo.state = 'failed';
+            state.appState.addingTodo.message = message;
         },
         pickDay: (state, day) => {
             state.pickedDay = day;
             state.isDayPicked = true;
         },
         displayDeleteTodoWindow: (state, todoId) => {
-            state.showDeleteTodoWindow = true;
-            state.todoToDelete = todoId;
+            state.appState.deletingTodo.showWindow = true;
+            state.appState.deletingTodo.todoToDelete = todoId;
         },
         hideDeleteTodoWindow: (state) => {
-            state.showDeleteTodoWindow = false;
-            state.deleteTodoErrorMessage = "";
-            state.deletingTodoState = 'idle';
-            state.todoToDelete = 0;
+            state.appState.deletingTodo.showWindow = false;
+            state.appState.deletingTodo.message = "";
+            state.appState.deletingTodo.state = 'idle';
+            state.appState.deletingTodo.todoToDelete = 0;
         },
         startDeletingTodo: (state) => {
-            state.deletingTodoState = 'inProgress';
+            state.appState.deletingTodo.state = 'inProgress';
         },
         endDeleteingTodoSuccess: (state) => {
-            state.deletingTodoState = 'idle';
-            state.deleteTodoErrorMessage = "";
+            state.appState.deletingTodo.statee = 'idle';
+            state.appState.deletingTodo.message = "";
         },
         endDeleteingTodoError: (state, message) => {
-            state.deletingTodoState = 'failed';
-            state.deleteTodoErrorMessage = message;
+            state.appState.deletingTodo.state = 'failed';
+            state.appState.deletingTodo.message = message;
         },
         changePickedTodo: (state, date) => {
             if (state.today.date == date) {
@@ -312,9 +387,45 @@ export const store = new Vuex.Store({
                     })[0];
                 }
             }
+        },
+        showPopup: (state, content) => {
+            state.appState.popup = {
+                show: true,
+                content: content
+            };
+        },
+        hidePopup: (state) => {
+            state.appState.popup = {
+                show: false,
+                content: 'None'
+            };
+        },
+        setRegistering: (state) => {
+            state.appState.register = {
+                state: 'registering',
+                message: ''
+            };
+        },
+        setRegisterSuccess: (state) => {
+            state.appState.register = {
+                state: 'success',
+                message: 'Successfuly registred, check your email adress and confirm account.'
+            };
+        },
+        setRegisterError: (state, message) => {
+            state.appState.register = {
+                state: 'error',
+                message: message
+            };
         }
     },
     actions: {
+        showPopup: (context, content) => {
+            context.commit('showPopup', content);
+        },
+        hidePopup: (context) => {
+            context.commit('hidePopup');
+        },
         logIn: (context, payload) => {
             // use payload pass and login
             context.commit('changeLoginStatus', "logginIn");
@@ -326,7 +437,7 @@ export const store = new Vuex.Store({
             })
             .then(function (response) {
                 console.log(response);
-                if (response.data.result.token)
+                if (response && response.data && response.data.result && response.data.result.token)
                 {
                     console.log('Udalo sie zalogowac. ' + response.data.result.token);
                     context.commit('saveLoggedUser', {
@@ -336,17 +447,54 @@ export const store = new Vuex.Store({
                 else
                 {
                     console.log("Nie udalo sie zalogowac.");
-                    context.commit('changeLoginStatus', "displayingLoginApplet");
+
+                    if (response && response.data && response.data.statusCode == 401)
+                        context.commit('loginError', { state: "error", message: response.data.validationState.errors[0].message});
+                    else
+                        context.commit('loginError', { state: "error", message: "There was an error during logging in, try again later." });
                 }
             })
             .catch(function (error) {
                 console.log(error);
+                context.commit('loginError', { state: "error", message: "There was an error during logging in, try again later." });
             });
         },
         logOut: (context, payload) => {
             // use payload pass and login
             context.commit('changeLoginStatus', "notLogged");
             context.commit('logOut');
+        },
+        register: (context, payload) => {
+
+            console.log("Register: " + JSON.stringify(payload));
+            context.commit('setRegistering');
+
+            axios.post(config.api + '/Users/register', {
+                Username: payload.username,
+                Password: payload.password,
+                Email: payload.email
+            })
+            .then(function (response) {
+                console.log(response);
+                if (response.status && response.status == 200)
+                {
+                    console.log('Udalo sie zarejestrowac. ');
+                    context.commit('setRegisterSuccess');
+                }
+                else
+                {
+                    console.log("Nie udalo sie zarejestrowac.");
+                    context.commit('setRegisterError', 'Error during register process, try again later.');
+                }
+            })
+            .catch(function (error) {
+                if (error && error.response && error.response.data && error.response.data.errors)
+                    var message = error.response.data.errors.map(e => e.object + ': ' + e.message).reduce((map, obj) => {
+                        map[obj.key] = obj.val;
+                        return map;
+                    });
+                context.commit('setRegisterError', 'Error during register process. ' + (message ? message : ""));
+            });
         },
         displayLoginWindow: (context, payload) => {
             // use payload pass and login
@@ -383,10 +531,9 @@ export const store = new Vuex.Store({
                 }
             })
             .catch(function (error) {
+                console.log(error);
                 context.commit('loadingDataFailed');
             });
-
-            console.log("End downloading data.");
         },
         loadEvents: (context) => {
             context.commit('startLoadingEvents');
@@ -412,6 +559,35 @@ export const store = new Vuex.Store({
             })
             .catch(function (error) {
                 context.commit('loadingEventsFailed');
+            });
+
+            console.log("End downloading data.");
+        },
+        loadChartData: (context, chart) => {
+            //context.commit('startLoadingChartData');
+
+            const options = {
+                method: 'GET',
+                headers : authHeader(),
+                url: config.api + '/Statistics/' + chart + '/' + getUserId(context)
+            };
+
+            axios(options)
+            .then(function (response) {
+                if (response.data.result)
+                {
+                    context.commit('loadingChartDataSuccess', {
+                        chart: chart,
+                        data: response.data.result
+                    });
+                }
+                else
+                {
+                    context.commit('loadingChartDataFailed');
+                }
+            })
+            .catch(function (error) {
+                context.commit('loadingChartDataFailed');
             });
 
             console.log("End downloading data.");
@@ -525,7 +701,7 @@ export const store = new Vuex.Store({
             });
         },
         mockLogin: (context) => {
-            //context.dispatch('logIn', { username: "test", password: "123456"});
+            context.dispatch('logIn', { username: "test10", password: "123456"});
         }
     }
 });

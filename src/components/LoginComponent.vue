@@ -37,13 +37,17 @@
                         </md-card-actions>
                 </md-card>
 
+                <md-snackbar :md-position="'center'" :md-duration="4000" :md-active.sync="showLoginSnack" md-persistent>
+                    <span>{{loginMessage}}</span>
+                </md-snackbar>
+
                 </form>
 
                 </md-tab>
 
                 <md-tab md-label="Register">
                 
-                <form novalidate class="md-layout" @submit.prevent="validateUser">
+                <form novalidate class="md-layout" @submit.prevent="validateUserRegister">
                     <md-card class="md-layout-item no-shadow md-gutter">
 
                             <div class="md-layout md-gutter">
@@ -89,41 +93,15 @@
                                 <md-button class="md-primary" @click="showDialog = false">Close</md-button>
                             </md-card-actions>
                     </md-card>
+                    <md-snackbar :md-position="'center'" :md-duration="4000" :md-active.sync="showSnack" md-persistent>
+                        <span>{{message}}</span>
+                    </md-snackbar>
                 </form>
                 
                 </md-tab>
             </md-tabs>
 
         </md-dialog>
-        <!-- 
-        <div class="loginContainer col-sm-6 offset-sm-4">
-            <div class="row">
-                <div class="loginContainer col-sm-12">
-                    <div class="close-button-div d-flex">
-                        <h2 class="">Login</h2>
-                        <div class="ml-auto">
-                            <i class="material-icons" v-on:click="hideWindow">close</i>
-                        </div>
-                    </div>
-                    <form @submit.prevent="logIn">
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" v-model="username" name="username" class="form-control" :class="{ 'is-invalid': submitted && !username }" />
-                            <div v-show="submitted && !username" class="invalid-feedback">Username is required</div>
-                        </div>
-                        <div class="form-group">
-                            <label htmlFor="password">Password</label>
-                            <input type="password" v-model="password" name="password" class="form-control" :class="{ 'is-invalid': submitted && !password }" />
-                        </div>
-                        <div class="form-group">
-                            <button class="btn btn-primary">Login</button>
-                            <img v-show="state" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        -->
 </div>
 </template>
 
@@ -157,9 +135,8 @@ export default {
                 newsletter: false,
                 terms: false
             },
-            test: {
-                input: null
-            }
+            showSnack: false,
+            showLoginSnack: false,
         }
     },
     validations: {
@@ -173,20 +150,59 @@ export default {
                 minLength: minLength(6)
             },
         },
-        test: {
-            input: {
-                required: true
-            }
+        register: {
+            username: {
+                required: true,
+                minLength: minLength(3)
+            },
+            password: {
+                required: true,
+                minLength: minLength(6)
+            },
+            email: {
+                required,
+                email
+            },
         }
     },
     computed: {
         state(){
-            return this.$store.state.loginStatus == "logginIn";
+            return this.$store.getters.isRegistering;
+        },
+        message() {
+            return this.$store.getters.registerMessage
+        },
+        loginMessage() {
+            return this.$store.getters.loginErrorMessage
+        },
+        isRegistering(){
+            return this.$store.getters.isRegistering;
+        },
+        isRegisterError(){
+            return this.$store.getters.isRegisterError;
+        },
+        isLoginError(){
+            return this.$store.getters.isLoginError;
+        },
+        isRegisterSuccess(){
+            return this.$store.getters.isRegisterSuccess;
+        },
+        showSnackComp() {
+            return this.isRegisterError || this.isRegisterSuccess;
+        },
+        showLoginSnackComp() {
+            return this.isLoginError;
         }
     },
     methods: {
+        tabChanged: function(id) {
+            console.log(id);
+        },
         logIn: function() {
             this.$store.dispatch('logIn', { username: this.login.username, password: this.login.password });
+        },
+        registerUser: function() {
+            this.$store.dispatch('register', { username: this.register.username, password: this.register.password, email: this.register.email });
         },
         hideWindow: function() {
             this.$store.dispatch('hideLoginWindow');
@@ -195,6 +211,12 @@ export default {
             this.$v.$touch()
             if (!this.$v.login.$invalid) {
                 this.logIn();
+            }
+        },
+        validateUserRegister () {
+            this.$v.$touch()
+            if (!this.$v.register.$invalid) {
+                this.registerUser();
             }
         },
         getValidationClass (fieldName) {
@@ -210,6 +232,18 @@ export default {
         showDialog: function(val) {
             if (val == false)
             this.$store.dispatch('hideLoginWindow');  
+        },
+        showSnackComp: function(val) {
+
+            if (this.isRegisterSuccess)
+            {
+                document.querySelectorAll(".md-tabs > div > button")[0].click();
+            }
+
+            this.showSnack = val;
+        },
+        showLoginSnackComp: function(val) {
+            this.showLoginSnack = val;
         }
     },
     mounted: function() {

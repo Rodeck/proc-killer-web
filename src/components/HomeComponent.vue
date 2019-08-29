@@ -8,15 +8,11 @@
             </div>
         </md-toolbar>
         <div class="row content">
-            <router-view></router-view>
+            <transition name="fade">
+                <router-view></router-view>
+            </transition>
             <transition name="fade">
                 <login-component class="loginApplet" v-if="showLoginApplet"></login-component>
-            </transition>
-
-            <main-view v-if="showSecret"></main-view>
-
-            <transition name="fade">
-                    <index-public  v-if="showPublicPage"></index-public>
             </transition>
         </div>
     </div>
@@ -82,6 +78,11 @@ export default {
 </script>
 
 <style scoped>
+
+html {
+    max-height: 100%;
+}
+
 .dark-nav{
     background-color: rgb(53, 53, 53);
     padding: 20px;
@@ -89,7 +90,6 @@ export default {
 }
 
 .content{
-    height: -webkit-fill-available;
     background-color: rgb(114, 116, 117);
     color: aliceblue;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

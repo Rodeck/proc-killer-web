@@ -69,7 +69,6 @@ export default {
     position: absolute;
     width: 30%;
     z-index: 10;
-    margin-left: 25%;
     -webkit-box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
     box-shadow:  0px 0px 0px 9999px rgba(0, 0, 0, 0.5);
     margin-top: 10px;

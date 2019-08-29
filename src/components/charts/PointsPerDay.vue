@@ -1,5 +1,6 @@
 <script>
 import { Line } from 'vue-chartjs'
+import * as moment from 'moment';
 
 export default {
     extends: Line,
@@ -34,10 +35,12 @@ export default {
     },
     methods: {
         getLabels() {
-            return this.data.map(x => x.Date);
+            return this.data.map(x => moment(x.date).format("DD.MM"));
         },
         getData() {
-            return this.data.map(x => x.Points);
+            return this.data.map(function(x) { 
+                return x.points;
+                });
         }
     },
     mounted () {

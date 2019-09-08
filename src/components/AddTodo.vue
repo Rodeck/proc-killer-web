@@ -1,31 +1,31 @@
 <template>
-        <div class="text-center border border-dark p-5 add-form">
-            <div class="close-button-div d-flex">
-                <div class="lds-ripple" v-bind:class="{ hide: !isLoading }"><div></div><div></div></div>
-                <p class="h4 header col-sm-6 offset-sm-1">Add new todo</p>
-                <div class="ml-auto">
-                    <i class="material-icons" v-on:click="hideWindow">close</i>
-                </div>
+    <div class="text-center border border-dark p-5 add-form">
+        <div class="close-button-div d-flex">
+            <div class="lds-ripple" v-bind:class="{ hide: !isLoading }"><div></div><div></div></div>
+            <p class="h4 header col-sm-6 offset-sm-1">Add new todo</p>
+            <div class="ml-auto">
+                <i class="material-icons" v-on:click="hideWindow">close</i>
             </div>
-
-            <!-- Name -->
-            <input type="text" id="defaultContactFormName" class="form-control mb-4" placeholder="Name" v-model="name">
-
-            <!-- Email -->
-            <textarea class="form-control" rows="5" id="comment" placeholder="What needs to be done?" v-model="description"></textarea>
-
-            <!-- Subject -->
-            <label>Date</label>
-            <input type="text" id="defaultContactFormName" class="form-control mb-4" v-model="date" readonly>
-
-            <div class="alert alert-danger" v-if="showErrorMsg">
-                <span class="h4 error-msg">{{errorMessage}}</span>
-            </div>
-
-            <!-- Send button -->
-            <button class="btn btn-info btn-block" v-on:click="addTodo">Add</button>
-
         </div>
+
+        <!-- Name -->
+        <input type="text" id="defaultContactFormName" class="form-control mb-4" placeholder="Name" v-model="name">
+
+        <!-- Email -->
+        <textarea class="form-control" rows="5" id="comment" placeholder="What needs to be done?" v-model="description"></textarea>
+
+        <!-- Subject -->
+        <label>Date</label>
+        <input type="text" id="defaultContactFormName" class="form-control mb-4" v-model="date" readonly>
+
+        <div class="alert alert-danger" v-if="showErrorMsg">
+            <span class="h4 error-msg">{{errorMessage}}</span>
+        </div>
+
+        <!-- Send button -->
+        <button class="btn btn-info btn-block" v-on:click="addTodo">Add</button>
+
+    </div>
 </template>
 
 <script>

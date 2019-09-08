@@ -1,5 +1,5 @@
 <template>
-    <md-card md-with-hover class="md-primary md-raised" md-theme="danger">
+    <md-card md-with-hover class="md-primary md-raised" md-theme="danger" :key="clostestTodosKey">
         <div v-if="day.todos.length > 0">
             <div v-if="day.pickedTodo != false">
                 <div class="completed-mark" v-if="day.pickedTodo.completed">
@@ -77,7 +77,7 @@
                 </md-button>
             </md-card-content>
         </div>
-</md-card>
+    </md-card>
 </template>
 
 <script>
@@ -98,6 +98,9 @@ export default {
         },
         canAdd() {
             return moment(this.day.date).isSame(moment(), 'day') || moment(this.day.date).isSame(moment().add(1, 'days'), 'day'); 
+        },
+        clostestTodosKey() {
+            return this.$store.getters.clostestTodosKey;
         }
     },
     watch: { 

@@ -27,7 +27,8 @@ export default {
                 datasets: [
                     {
                         label: "Earned points",
-                        data: this.getData()
+                        data: this.getData(),
+                        backgroundColor: '#69F0AE'
                     }
                 ]
             }

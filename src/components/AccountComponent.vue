@@ -1,10 +1,10 @@
 <template>
-        <md-card v-if="isLoaded">
+        <md-card>
             <md-card-header>
                 <div class="md-title">Account</div>
             </md-card-header>
             <md-card-content>
-                <md-list class="md-dense">
+                <md-list class="md-dense" v-if="isLoaded">
                     <md-list-item>
                         <md-icon>account_circle</md-icon>
                         <span class="md-list-item-text">{{user.username}}</span>
@@ -25,11 +25,12 @@
                         <md-tooltip md-direction="top">Total todos completed</md-tooltip>
                     </md-list-item>
                 </md-list>
+                <div v-else>
+                    <loading-bar></loading-bar>
+                </div>
             </md-card-content>
     </md-card>
-    <div v-else>
-        <loading-bar></loading-bar>
-    </div>
+
 </template>
 
 

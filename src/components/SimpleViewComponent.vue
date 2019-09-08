@@ -7,7 +7,7 @@
             <mini-rewards></mini-rewards>
         </div>
         <div class="md-layout-item md-size-60">
-            <clostest-todos></clostest-todos>
+            <clostest-todos :key="todoKey"></clostest-todos>
         </div>
         <transition name="fade">
             <add-todo v-if="showAddTodoWindow"></add-todo>
@@ -43,6 +43,9 @@ export default {
         showAddTodoWindow(){
             return this.$store.getters.showAddTodoWindow;
         },
+        todoKey() {
+            return this.$store.getters.clostestTodosKey;
+        }
     },
     methods: {
         formatDate(date) {

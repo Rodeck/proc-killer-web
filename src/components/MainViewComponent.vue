@@ -1,84 +1,87 @@
 <template>
-    <div class="md-content view-content">
+    <div class="md-content view-content md-layout md-alignment-center md-gutter">
          <transition name="fade">
             <add-todo v-if="showAddTodoWindow"></add-todo>
+            <day-popup v-if="isDayPicked" :day="pickedDay"></day-popup>
         </transition>
-        <div class="md-layout md-alignment-center">
-            <div class="md-layout-item md-size-30" id="statistics">
-                <mini-charts v-if="chartSize != null" :size="chartSize"></mini-charts>
-            </div>
-            <md-card class="md-layout-item md-size-65">
-                <md-card-content class="md-layout md-gutter">
-                    <div class="md-layout-item md-size-100">
-                        <div class="md-layout md-gutter md-alignment-center-center">
-                            <div class="md-layout-item md-size-15">
-                                <md-button>
-                                    <md-icon class="inline">arrow_left</md-icon>
-                                </md-button>
-                            </div>
-                            <div class="md-layout-item md-size-20 month-title-container">
-                                <span class="md-display-3 month-title">May</span>
-                            </div>
-                            <div class="md-layout-item md-size-15">
-                                <md-button>
-                                    <md-icon class="inline">arrow_right</md-icon>
-                                </md-button>
-                            </div>
+        <md-card class="md-layout-item md-size-80" id="callendar">
+            <md-card-content class="md-layout md-gutter">
+                <div class="md-layout-item md-size-100">
+                    <div class="md-layout md-gutter md-alignment-center-center">
+                        <div class="md-layout-item md-size-15">
+                            <md-button>
+                                <md-icon class="inline">arrow_left</md-icon>
+                            </md-button>
+                        </div>
+                        <div class="md-layout-item md-size-20 month-title-container">
+                            <span class="md-display-3 month-title">May</span>
+                        </div>
+                        <div class="md-layout-item md-size-15">
+                            <md-button>
+                                <md-icon class="inline">arrow_right</md-icon>
+                            </md-button>
                         </div>
                     </div>
-                    <div class="md-layout-item md-size-100">
-                        <div class="week-day-header">
-                            Mon
-                        </div>
-                        <div class="week-day-header">
-                            Tue
-                        </div>
-                        <div class="week-day-header">
-                            Wed
-                        </div>
-                        <div class="week-day-header">
-                            Thu
-                        </div>
-                        <div class="week-day-header">
-                            Fri
-                        </div>
-                        <div class="week-day-header">
-                            Sat
-                        </div>
-                        <div class="week-day-header">
-                            Sun
-                        </div>
+                </div>
+                <div class="md-layout-item md-size-100">
+                    <div class="week-day-header">
+                        Mon
                     </div>
-                    <div class="tool-window" id="controll" v-show="showControll" v-closable="{
-                            handler: 'closeToolWindow',
-                            exclude: ['dayPanel']
-                        }">
-                        <md-button class="md-icon-button"  v-on:click="addTodo">
-                            <md-icon class="inline">add_circle_outlined</md-icon>
-                        </md-button>
-                        <md-button class="md-icon-button">
-                            <md-icon class="inline">clear</md-icon>
-                        </md-button>
+                    <div class="week-day-header">
+                        Tue
                     </div>
-                    <div class="md-layout-item md-size-100" v-if="isDataLoaded && filledDays">
-                        <div v-for="row in rows" v-bind:key="row.no" class="week-wrapper">
-                            <div v-for="day in getDays(row.no)" v-bind:key="day.no" class="day-wrapper" v-bind:class="[{deactivatedDay: day.isPast}, {currentDay: day.isToday}]" 
-                                 v-on:click="showToolWindow(day.no, $event)" ref="dayPanel"  v-bind:style="{ backgroundColor: calcColor(day.no)}"
-                            >
-                                <div class="md-body-2 day-no">
-                                    {{day.no}}
-                                </div>
-                                <div class="todos-wrapper" v-if="day.todos">
-                                    <div v-for="todo in day.todos.todos" v-bind:key="todo.id" class="single-todo">
-                                        {{todo.name}}
-                                    </div>
-                                </div>
-                            </div>  
-                        </div>      
-                    </div>   
-                </md-card-content>
-            </md-card>
-        </div>
+                    <div class="week-day-header">
+                        Wed
+                    </div>
+                    <div class="week-day-header">
+                        Thu
+                    </div>
+                    <div class="week-day-header">
+                        Fri
+                    </div>
+                    <div class="week-day-header">
+                        Sat
+                    </div>
+                    <div class="week-day-header">
+                        Sun
+                    </div>
+                </div>
+                <div class="tool-window" id="controll" v-show="showControll" v-closable="{
+                        handler: 'closeToolWindow',
+                        exclude: ['dayPanel']
+                    }">
+                    <md-button class="md-icon-button"  v-on:click="addTodo">
+                        <md-icon class="inline">add_circle_outlined</md-icon>
+                    </md-button>
+                    <md-button class="md-icon-button">
+                        <md-icon class="inline">clear</md-icon>
+                    </md-button>
+                </div>
+                <div class="md-layout-item md-size-100" v-if="isDataLoaded && filledDays">
+                    <div v-for="row in rows" v-bind:key="row.no" class="week-wrapper">
+                        <div v-for="day in getDays(row.no)" v-bind:key="day.no" class="day-wrapper" v-bind:class="[{deactivatedDay: day.isPast}, {currentDay: day.isToday}]" 
+                                v-on:click="showToolWindow(day.no, $event)" ref="dayPanel"  v-bind:style="{ backgroundColor: calcColor(day.no)}" md-menu-trigger
+                        >
+                            <div class="md-body-2 day-no">
+                                {{day.no}}
+                            </div>
+                            <div class="todos-wrapper" v-if="day.todos">
+                                <md-list class="md-dense todos-list">
+                                    <md-list-item v-for="todo in constrainTodos(day.todos.todos, 2)" v-bind:key="todo.id">
+                                        <p class="title-wrapper">{{todo.name}}</p> 
+                                        <md-icon v-if="todo.completed" style="color: green;">thumb_up_alt</md-icon>
+                                        <md-icon v-else style="color: red;">thumb_down_alt</md-icon>
+                                    </md-list-item>
+                                    <md-list-item v-if="day.todos.todos.length > 2">
+                                        ...
+                                    </md-list-item>
+                                </md-list>
+                            </div>
+                        </div>  
+                    </div>      
+                </div>   
+            </md-card-content>
+        </md-card>
     </div>
 </template>
 
@@ -89,16 +92,15 @@ import * as Day from '../types/Day'
 import * as moment from 'moment';
 import TodoView from './TodoView.vue'
 import AddTodo from './AddTodo.vue'
-import MiniCharts from './MiniChartsComponent.vue'
-
+import DayPopup from './Day.vue'
 import Loading from './LoadingBar.vue'
 
 export default {
     components: {
         'todo': TodoView,
         'add-todo': AddTodo,
-        'mini-charts': MiniCharts,
-        'loading-bar': Loading
+        'loading-bar': Loading,
+        'day-popup': DayPopup
     },
     data() {
         return {
@@ -110,7 +112,9 @@ export default {
             today: Object,
             yesterday: Object,
             tomorrow: Object,
-            chartSize: Number
+            chartSize: Number,
+            chartHeight: Number,
+            isMounted: false
         }
     },
     computed: {
@@ -132,8 +136,11 @@ export default {
         viewKey() {
             return this.$store.state.viewKey;
         },
-        dayIsPicked() {
-            return this.$store.state.isDayPicked;
+        isDayPicked() {
+            return this.$store.getters.isDayPicked;
+        },
+        pickedDay() {
+            return this.$store.getters.pickedDay;
         }
     },
     watch: {
@@ -143,6 +150,9 @@ export default {
         }
     },
     methods: {
+        constrainTodos(array, number) {
+            return array.slice(0, number);
+        },
         calcColor(day) {
             
             var percent = day/31;
@@ -159,6 +169,7 @@ export default {
             this.$store.dispatch('displayAddTodoWindow');
         },
         showToolWindow(dayNo, e) {
+            console.log('Show tool window.');
             this.showControll = true;
 
             let x = e.screenX;
@@ -246,13 +257,20 @@ export default {
         }
     },
     mounted: function() {
+        console.log("MainViewLoaded");
         this.$store.dispatch('loadData');
-        this.chartSize = document.getElementById('statistics').clientWidth - 60;
+        this.isMounted = true;
     }
 }
 </script>
 
 <style scoped>
+
+#statistics {
+    height: 30%;
+    max-height: 30%;
+    min-height: 30%;
+}
 
 .main-layout {
     padding-top: 5%;
@@ -273,6 +291,13 @@ export default {
     -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
     position: fixed;
+}
+
+.title-wrapper {
+    width: 250px;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
 }
 
 .week-wrapper {
@@ -452,6 +477,10 @@ box-shadow: -10px 0px 26px 0px rgba(0,0,0,0.75);
 .content_ [class*="col-"]{
     margin-bottom: -99999px;
     padding-bottom: 99999px;
+}
+
+.todos-list {
+    background-color: unset !important;
 }
 
 .lds-ripple {

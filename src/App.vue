@@ -7,8 +7,9 @@
             </div>
             <div class="md-layout-item md-size-65 align-left md-layout md-gutter md-alignment-center-left">
                 <router-link to="/home"><md-button>Home</md-button></router-link>
-                <router-link to="/main"><md-button>Dashboard</md-button></router-link>
-                <router-link to="/simpleView"><md-button>Simple view</md-button></router-link>
+                <router-link to="/main"><md-button>Callendar</md-button></router-link>
+                <router-link to="/simpleView"><md-button>Dashboard</md-button></router-link>
+                <router-link to="/stats"><md-button>Charts</md-button></router-link>
             </div>
         </div>
         <div class="md-layout-item md-size-30 align-right md-layout md-gutter md-alignment-center-right">
@@ -28,7 +29,6 @@
 </template>
 
 <script>
-import Home from './components/HomeComponent.vue'
 import '../Viewport.scss'
 import router from './router'
 import Login from "./components/LoginComponent.vue"
@@ -69,11 +69,11 @@ export default {
         showSecret: function(value) {
             if (value)
             {
-                this.$router.push('Main');
+                //this.$router.push('Main');
             }
-            else
+                else
             {
-                this.$router.push('Home');
+                //this.$router.push('Home');
             }
         }
     },
@@ -114,10 +114,10 @@ body{
 
 .content{
     height: -webkit-fill-available;
-    background-color: rgb(114, 116, 117);
     color: aliceblue;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-image: url("./assets/motivational-bg.png");
+    background-size: cover;
     margin-top: -15px;
 }
 

@@ -70,6 +70,10 @@ export default {
         },
     },
     mounted () {
+        this.$store.dispatch('markAction', { 
+            type: 'seeRewards',
+            completed: true
+        });
     }
 }
 </script>

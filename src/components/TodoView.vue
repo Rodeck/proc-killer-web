@@ -1,19 +1,29 @@
 <template>
-    <div class="todo-wrapper">
-        <div class="container todo-wrapper" v-if="todo != null">
-            <div class="row row-name">
-                <h1> {{ todo.name }} </h1>
+    <div class="todo-wrapper md-elevation-3">
+        <div class="container todo-wrapper md-layout" v-if="todo != null">
+            <div class="md-layout-item md-size-10">
+                <md-icon v-if="todo.completed" style="color: green;">thumb_up_alt</md-icon>
+                <md-icon v-else style="color: red;">thumb_down_alt</md-icon>
             </div>
-            <div class="row row-description">
-                <h3> {{ todo.description }} </h3>
+            <div class="md-layout-item md-size-75 md-body-2">
+                {{ todo.name }}
             </div>
-            <div class="row row-controls">
-                <i class="material-icons add-btn todo-controll">check_circle</i>
-                <i class="material-icons add-btn todo-controll" v-on:click="displayDeleteWindow">delete_forever</i>
+            <div class="md-layout-item md-size-15" v-if="!todo.completed">
+                <md-button class="md-icon-button">
+                    <md-icon style="color: red;">delete</md-icon>
+                </md-button>
+            </div>
+            <div class="md-layout-item md-size-100 md-body-1">
+                {{ todo.description }}
+            </div>
+            <div class="md-layout-item md-size-100 md-body-1">
+                <md-button class="md-raised">Complete</md-button>
             </div>
         </div>
-        <div class="container add-wrapper" v-if="todo == null">
-            <i class="material-icons add-btn" v-on:click="displayAddWindow">add</i>
+        <div v-else>
+            <md-button class="md-icon-button md-raised" v-on:click="displayAddWindow">
+                <md-icon>add</md-icon>
+            </md-button>
         </div>
     </div>
 </template>
@@ -46,59 +56,11 @@ export default {
 </script>
 
 <style scoped>
+
 .todo-wrapper {
     height: 100%;
+    padding: 3px;
+    margin: 3px;
 }
 
-.add-wrapper {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.row-name{
-    height: 15%;
-}
-
-.row-description {
-    height: 70%;
-}
-
-.row-controls {
-    height: 10%;
-}
-
-.todo-controll {
-    margin-right: 10px;
-}
-
-.add-btn {
-    margin-top: auto;
-    margin-bottom: auto;
-    background-color: rgb(122, 97, 65);
-    border-radius: 50%;
-    border-width: 3px;
-    border: 1px solid bisque;
-    width: 50px;
-    height: 50px;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    padding: 12px;
-    -webkit-transition: background-color 1s; /* Safari */
-    transition: background-color 1s;
-          -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
-}
-
-.add-btn:hover {
-    background-color: rgb(170, 135, 90);
-}
 </style>

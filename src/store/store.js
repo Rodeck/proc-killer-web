@@ -37,12 +37,7 @@ function getUserId(context) {
 
 export const store = new Vuex.Store({
     strict: true,
-    plugins: [
-        createPersistedState({
-          getState: (key) => Cookies.getJSON(key),
-          setState: (key, state) => Cookies.set(key, state, { expires: 3, secure: true })
-        })
-    ],
+    plugins: [createPersistedState()],
     state: {
         // notLogged, displayingLoginApplet, loggingIn, loggedIn
         user: null,
@@ -58,6 +53,9 @@ export const store = new Vuex.Store({
                 state: "idle",
                 message: null
             },
+            actions: {
+
+            },
             events: {
                 state: "notLoaded",
                 message: null
@@ -68,6 +66,10 @@ export const store = new Vuex.Store({
             },
             charts: {
                 pointsPerDay: { 
+                    state: "notLoaded",
+                    message: null
+                },
+                cumulative: { 
                     state: "notLoaded",
                     message: null
                 }
@@ -86,10 +88,17 @@ export const store = new Vuex.Store({
             popup: {
                 show: false,
                 content: 'None'
-            }
+            },
+            clostestTodosKey: 0
         }
     },
     getters: {
+        isDayPicked(state) {
+            return state.pickedDay ? true : false;
+        },
+        clostestTodosKey(state) {
+            return state.appState.clostestTodosKey;
+        },
         isRegistering(state) {
             return state.appState.register.state == 'registering';
         },
@@ -158,6 +167,9 @@ export const store = new Vuex.Store({
             else
                 return null;
         },
+        pickedDay: state => {
+            return state.pickedDay;
+        },
         isLogged: state => {
             return state.appState.login.state == "loggedIn";
         },
@@ -190,6 +202,14 @@ export const store = new Vuex.Store({
                     return null;
             }
         },
+        isActionCompleted: state => {
+            return action => {
+                if (state.appState.actions && state.appState.actions[action])
+                    return state.appState.actions[action].completed;
+                else
+                    return false;
+            }
+        },
         showPopup: state => {
             return state.appState.popup.show;
         },
@@ -218,6 +238,7 @@ export const store = new Vuex.Store({
             state.appState.login.state = "notLogged";
             localStorage.setItem('token', null);
             state.user = null;
+            Vue.router.push('/');
         },
         saveToken: (state, token) => {
             localStorage.setItem('token', token);
@@ -227,6 +248,7 @@ export const store = new Vuex.Store({
             localStorage.setItem('userId', userData.user.id);
             state.appState.login.state = "loggedIn";
             state.user = userData.user;
+            Vue.router.push('/home');
         },
         setUser: (state, user) => {
             state.user = user;
@@ -285,7 +307,6 @@ export const store = new Vuex.Store({
             else
                 state.tomorrow.pickedTodo = false;
 
-            console.log("Data loaded.");
             state.appState.callendar.state = 'loaded';
             state.viewKey += 1;
         },
@@ -372,7 +393,6 @@ export const store = new Vuex.Store({
                 }
             }
             else if (state.tomorrow.date == date) {
-                console.log("Change tomorrow todo.");
                 if (state.tomorrow.todos.length == 1 && state.tomorrow.pickedTodo == false)
                 {
                     state.tomorrow.pickedTodo = state.tomorrow.todos[0];
@@ -387,6 +407,7 @@ export const store = new Vuex.Store({
                     })[0];
                 }
             }
+            state.appState.clostestTodosKey++;
         },
         showPopup: (state, content) => {
             state.appState.popup = {
@@ -417,6 +438,15 @@ export const store = new Vuex.Store({
                 state: 'error',
                 message: message
             };
+        },
+        markAction: (state, action) => {
+            if (!state.appState.actions[action.type])
+                state.appState.actions[action.type] = {};
+            
+            state.appState.actions[action.type].completed = action.completed;
+        },
+        clearPickedDay: (state) => {
+            state.pickedDay = null;
         }
     },
     actions: {
@@ -429,25 +459,21 @@ export const store = new Vuex.Store({
         logIn: (context, payload) => {
             // use payload pass and login
             context.commit('changeLoginStatus', "logginIn");
-            console.log("Login: " + payload.username + ", pass: " + payload.password);
 
             axios.post(config.api + '/Users/authenticate', {
                 Username: payload.username,
                 Password: payload.password
             })
             .then(function (response) {
-                console.log(response);
                 if (response && response.data && response.data.result && response.data.result.token)
                 {
-                    console.log('Udalo sie zalogowac. ' + response.data.result.token);
                     context.commit('saveLoggedUser', {
                         user: response.data.result
                     });
+                    context.dispatch('loadData');
                 }
                 else
                 {
-                    console.log("Nie udalo sie zalogowac.");
-
                     if (response && response.data && response.data.statusCode == 401)
                         context.commit('loginError', { state: "error", message: response.data.validationState.errors[0].message});
                     else
@@ -455,7 +481,6 @@ export const store = new Vuex.Store({
                 }
             })
             .catch(function (error) {
-                console.log(error);
                 context.commit('loginError', { state: "error", message: "There was an error during logging in, try again later." });
             });
         },
@@ -465,8 +490,6 @@ export const store = new Vuex.Store({
             context.commit('logOut');
         },
         register: (context, payload) => {
-
-            console.log("Register: " + JSON.stringify(payload));
             context.commit('setRegistering');
 
             axios.post(config.api + '/Users/register', {
@@ -475,15 +498,12 @@ export const store = new Vuex.Store({
                 Email: payload.email
             })
             .then(function (response) {
-                console.log(response);
                 if (response.status && response.status == 200)
                 {
-                    console.log('Udalo sie zarejestrowac. ');
                     context.commit('setRegisterSuccess');
                 }
                 else
                 {
-                    console.log("Nie udalo sie zarejestrowac.");
                     context.commit('setRegisterError', 'Error during register process, try again later.');
                 }
             })
@@ -509,8 +529,6 @@ export const store = new Vuex.Store({
         },
         loadData: (context) => {
             context.commit('startLoadingData');
-            
-            console.log("Starting downloading data.");
 
             const options = {
                 method: 'GET',
@@ -531,14 +549,11 @@ export const store = new Vuex.Store({
                 }
             })
             .catch(function (error) {
-                console.log(error);
                 context.commit('loadingDataFailed');
             });
         },
         loadEvents: (context) => {
             context.commit('startLoadingEvents');
-            
-            console.log("Starting downloading events.");
 
             const options = {
                 method: 'GET',
@@ -560,12 +575,8 @@ export const store = new Vuex.Store({
             .catch(function (error) {
                 context.commit('loadingEventsFailed');
             });
-
-            console.log("End downloading data.");
         },
         loadChartData: (context, chart) => {
-            //context.commit('startLoadingChartData');
-
             const options = {
                 method: 'GET',
                 headers : authHeader(),
@@ -589,8 +600,6 @@ export const store = new Vuex.Store({
             .catch(function (error) {
                 context.commit('loadingChartDataFailed');
             });
-
-            console.log("End downloading data.");
         },
         markCompleted: (context, id) => {
             const options = {
@@ -602,12 +611,18 @@ export const store = new Vuex.Store({
 
             axios(options)
             .then(function (response) {
-                console.log("Succes while marking todo as completed.")
+                context.commit('markAction', {
+                    type: 'completeTodo',
+                    completed: true
+                });
                 context.dispatch('loadData');
             })
             .catch(function (error) {
-                console.log("Error while marking todo as completed.")
+                console.log("Error while marking todo as completed.", error)
             });
+        },
+        markAction(context, payload) {
+            context.commit('markAction', payload);
         },
         restore: (context, id) => {
             const options = {
@@ -619,11 +634,9 @@ export const store = new Vuex.Store({
 
             axios(options)
             .then(function (response) {
-                console.log("Succes while restoring todo.")
                 context.dispatch('loadData');
             })
             .catch(function (error) {
-                console.log("Error while restoring todo.")
             });
         },
         displayAddTodoWindow: (context) => {
@@ -635,7 +648,6 @@ export const store = new Vuex.Store({
         addTodo: (context, payload) => {
             context.commit('startAddingTodo');
 
-            console.log(payload.date);
             var apiDate = moment(payload.date, "YYYY-MM-DD").format("YYYY-MM-DD[T00:00:00.00]");
 
             const options = {
@@ -647,6 +659,10 @@ export const store = new Vuex.Store({
 
             axios(options)
             .then(function (response) {
+                context.commit('markAction', {
+                    type: 'addTodo',
+                    completed: true
+                });
                 context.commit('hideAddTodoWindow');
                 context.dispatch('loadData');
             })
@@ -701,7 +717,10 @@ export const store = new Vuex.Store({
             });
         },
         mockLogin: (context) => {
-            context.dispatch('logIn', { username: "test10", password: "123456"});
+            //context.dispatch('logIn', { username: "test10", password: "123456"});
+        },
+        clearPickedDay: (context) => {
+            context.commit('clearPickedDay');
         }
     }
 });

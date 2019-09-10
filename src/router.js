@@ -4,6 +4,7 @@ import MainView from "./components/MainViewComponent.vue"
 import SimpleView from "./components/SimpleViewComponent.vue"
 import LoginHome from "./components/LoginHomeComponent.vue"
 import Statistics from './components/MiniChartsComponent.vue'
+import List from './components/TodoListComponent.vue'
 import Vue from 'vue'
 
 Vue.use(Router)
@@ -35,13 +36,18 @@ const router = new Router({
       path: '/stats',
       name: 'Statistics',
       component: Statistics
+    },
+    {
+      path: '/list',
+      name: 'List',
+      component: List
     }
   ]
 })
 
 Vue.router = router;
 
-const requiresLogin = ["Main", 'SimpleView', 'LoginHome', 'Statistics'];
+const requiresLogin = ["Main", 'SimpleView', 'LoginHome', 'Statistics', 'List'];
 
 router.beforeEach((to, from, next) => {
   if (requiresLogin.some(e => e == to.name) && !localStorage.getItem("token")) {

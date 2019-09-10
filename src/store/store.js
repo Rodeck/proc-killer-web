@@ -5,7 +5,6 @@ import * as User from '../types/User'
 import * as moment from 'moment';
 import * as Day from '../types/Day'
 import createPersistedState from 'vuex-persistedstate'
-import * as Cookies from 'js-cookie'
 
 Vue.use(Vuex);
 
@@ -54,7 +53,7 @@ export const store = new Vuex.Store({
                 message: null
             },
             actions: {
-
+                actionDate: null
             },
             events: {
                 state: "notLoaded",

@@ -2,7 +2,7 @@
     <div class="md-content view-content md-layout md-alignment-center md-gutter">
          <transition name="fade">
             <add-todo v-if="showAddTodoWindow"></add-todo>
-            <day-popup v-if="isDayPicked" :day="pickedDay"></day-popup>
+            <day-popup v-if="isDayPicked" :day="pickedDay" :key="viewKey"></day-popup>
         </transition>
         <md-card class="md-layout-item md-size-80" id="callendar">
             <md-card-content class="md-layout md-gutter">
@@ -72,9 +72,9 @@
                                         <md-icon v-if="todo.completed" style="color: green;">thumb_up_alt</md-icon>
                                         <md-icon v-else style="color: red;">thumb_down_alt</md-icon>
                                     </md-list-item>
-                                    <md-list-item v-if="day.todos.todos.length > 2">
-                                        ...
-                                    </md-list-item>
+                                    <div v-if="day.todos.todos.length > 2" class="more-list-item">
+                                        <p class="more-list-item-p">...</p>
+                                    </div>
                                 </md-list>
                             </div>
                         </div>  
@@ -266,6 +266,14 @@ export default {
 
 <style scoped>
 
+.more-list-item {
+    text-align: center !important;
+}
+
+.more-list-item-p {
+    display: inline-block;
+}
+
 #statistics {
     height: 30%;
     max-height: 30%;
@@ -363,7 +371,7 @@ export default {
 }
 
 .day-wrapper {
-    height: 80px;
+    height: 110px;
     width: 13.28%;
     display: inline-flex;
     margin-left: 1%;

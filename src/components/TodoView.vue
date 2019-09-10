@@ -17,7 +17,15 @@
                 {{ todo.description }}
             </div>
             <div class="md-layout-item md-size-100 md-body-1">
-                <md-button class="md-raised">Complete</md-button>
+                <md-button v-if="!todo.completed" v-on:click="markAsCompleted" class="md-icon-button md-raised">
+                    <md-icon>check</md-icon>
+                </md-button>
+                <md-button v-if="todo.completed" v-on:click="restore" class="md-icon-button md-raised">
+                    <md-icon>replay</md-icon>
+                </md-button>
+                <md-button v-if="!todo.completed" v-on:click="deleteTodo" class="md-icon-button md-raised">
+                    <md-icon>delete</md-icon>
+                </md-button>
             </div>
         </div>
         <div v-else>
@@ -47,6 +55,15 @@ export default {
         },
         displayDeleteWindow: function() {
             this.$store.dispatch('displayDeleteTodoWindow', this.todo.id);
+        },
+        markAsCompleted(id) {
+            this.$store.dispatch('markCompleted', this.todo.id);
+        },
+        restore() {
+
+        },
+        deleteTodo() {
+            
         }
     },
     updated() {

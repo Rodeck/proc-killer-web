@@ -8,6 +8,7 @@
             <div class="md-layout-item md-size-65 align-left md-layout md-gutter md-alignment-center-left">
                 <router-link to="/home"><md-button>Home</md-button></router-link>
                 <router-link to="/main"><md-button>Callendar</md-button></router-link>
+                <router-link to="/list"><md-button>Todo List</md-button></router-link>
                 <router-link to="/simpleView"><md-button>Dashboard</md-button></router-link>
                 <router-link to="/stats"><md-button>Charts</md-button></router-link>
             </div>

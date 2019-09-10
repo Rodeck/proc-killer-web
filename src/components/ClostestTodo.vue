@@ -3,7 +3,8 @@
         <div v-if="day.todos.length > 0">
             <div v-if="day.pickedTodo != false">
                 <div class="completed-mark" v-if="day.pickedTodo.completed">
-                    Completed!
+                    <md-icon v-if="day.pickedTodo.completed" style="color: green;">thumb_up_alt</md-icon>
+                    <md-icon v-else style="color: red;">thumb_down_alt</md-icon>
                 </div>
                 <md-card-header>
                     <md-ripple>
@@ -130,12 +131,10 @@ export default {
 
 .completed-mark {
     position: absolute;
-    left: -30px;
-    transform: rotate(-20deg);
+    left: 10px;
     display: inline-block;
     color: green;
     font-size: 2em;
-    text-shadow: 2px 2px #2f6351;
 }
 
 .card-header {

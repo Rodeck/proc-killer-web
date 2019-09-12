@@ -4,22 +4,22 @@
             <md-card-header>
                 <div class="md-title">Your Todos</div>
             </md-card-header>
-            <md-card-content>
+            <div>
                 <md-list class="md-dense" v-if="isLoaded">
-                    <md-list-item class="single-day md-layout">
+                    <div class="single-day md-layout">
                         <md-card md-with-hover class="md-layout-item md-size-100">
                             <md-card-content class="md-layout">
                                 <div class="md-layout-item md-size-10 md-title">
                                 </div>
-                                <div class="md-layout-item md-size-90">
+                                <div class="md-layout-item md-size-85">
                                     <div class="md-dense">
                                         <div class="md-layout">
                                             <div class="md-layout-item md-size-100">
                                                 <div class="md-layout">
-                                                    <div class="md-layout-item md-size-10 md-headline">
+                                                    <div class="md-layout-item md-size-20 md-headline">
                                                         Title
                                                     </div>
-                                                    <div class="md-layout-item md-size-30 md-headline">
+                                                    <div class="md-layout-item md-size-40 md-headline">
                                                         Description
                                                     </div>
                                                     <div class="md-layout-item md-size-10 md-headline">
@@ -35,15 +35,16 @@
                                 </div>
                             </md-card-content>
                         </md-card>
-                    </md-list-item>
-                    <md-list-item v-for="day in days" :key="day.date" class="single-day md-layout">
+                    </div>
+                    <transition-group name="list">
+                    <div v-for="day in getDays" :key="day.date" class="single-day md-layout">
                         <md-card md-with-hover class="md-layout-item md-size-100" :class="{'md-elevation-20': isToday(day.date)}">
                             <md-card-content class="md-layout">
-                                <div class="md-layout-item md-size-10 md-title">
+                                <div class="md-layout-item md-size-10" :class="{'md-title': day.todos.length > 0}">
                                 {{formatDate(day.date)}}
                                 </div>
                                 <div class="md-layout-item md-size-85"> 
-                                    <div v-for="todo in day.todos" :key="todo.id" class="md-layout">
+                                    <div v-for="todo in day.todos" :key="todo.id" class="md-layout md-elevation-3 single-todo">
                                         <div class="md-layout-item md-size-100">
                                             <div>
                                                 <md-button v-if="todo.completed" class="md-icon-button">
@@ -66,21 +67,21 @@
                                                 </md-button>
                                             </div>
                                             <div class="md-layout">
-                                                <div class="md-layout-item md-size-10 md-headline">
+                                                <div class="md-layout-item md-size-20 md-headline">
                                                     <span>{{todo.name}}</span>
                                                 </div>
-                                                <div class="md-layout-item md-size-30 md-headline">
+                                                <div class="md-layout-item md-size-40 md-headline">
                                                     {{todo.description}}
                                                 </div>
                                                 <div class="md-layout-item md-size-10 md-headline">
                                                     {{formatDate(todo.finishTime)}}
                                                 </div>
                                                 <div class="md-layout-item md-size-20">
-                                                    <md-chips class="md-primary shake-on-error" v-model="todo.chips" md-placeholder="Add tag...">
+                                                    <md-chips class="md-primary shake-on-error" v-model="todo.tags" md-placeholder="Add tag..." 
+                                                       @md-insert="chipInserted">
                                                     </md-chips>
                                                 </div>
                                             </div>
-                                                <md-divider></md-divider>
                                         </div>
                                     </div>
                                 </div>
@@ -91,12 +92,24 @@
                                 </div>
                             </md-card-content>
                         </md-card>
-                    </md-list-item>
+                    </div>
+                    </transition-group>
+                     <div class="single-day md-layout">
+                        <md-card md-with-hover class="md-layout-item md-size-100">
+                            <md-card-content class="md-layout">
+                                <div class="md-layout-item md-size-100" style="text-align: center">
+                                    <md-button v-for="(idx, page) in pagesCount" :key="page" class="md-icon-button md-primary" v-on:click="switchPage(idx)">
+                                        {{idx}}
+                                    </md-button>
+                                </div>
+                            </md-card-content>
+                        </md-card>
+                    </div>
                 </md-list>
                 <div v-else>
                     <loading-bar></loading-bar>
                 </div>
-            </md-card-content>
+            </div>
     </md-card>   
     <transition name="fade">
         <add-todo v-if="showAddTodoWindow"></add-todo>
@@ -117,9 +130,22 @@ export default {
         'loading-bar': Loading,
         'add-todo': AddTodo,
     },
+    data() {
+        return {
+            pageModel: 0,
+            daysPerPage: 5
+        }
+    },
     props: {
     },
     computed: {
+        pagesCount() 
+        {
+            return this.days.length / this.daysPerPage;
+        },
+        page() {
+            return parseInt(this.pageModel);
+        },
         date() {
             return moment(this.day.date).format("YYYY-MM-DD");
         },
@@ -135,10 +161,16 @@ export default {
         showAddTodoWindow(){
             return this.$store.getters.showAddTodoWindow;
         },
+        getDays() {
+            return this.days.slice(this.page * this.daysPerPage, this.page * this.daysPerPage +  this.daysPerPage);
+        }
     },
     watch: { 
     },
     methods: {
+        switchPage(page) {
+            this.pageModel = page;
+        },
         changeTodaysTodo() {
             this.$store.dispatch('changePickedTodo', this.day.date);
         },
@@ -164,9 +196,15 @@ export default {
         },
         isToday(date) {
             return moment(date).startOf('day').isSame(moment().startOf('day'));
+        },
+        chipInserted(payload) {
+            console.log(payload);
         }
     },
     mounted: function() {
+    },
+    events: {
+
     }
 }
 </script>
@@ -181,8 +219,28 @@ export default {
     margin: 5px;
 }
 
-.today {
+.single-todo {
+    margin: 5px;
+    padding: 5px;
+}
 
+.list {
+  transition: all 0.5s;
+
+}
+.list-enter, .list-leave-to
+/* .card-leave-active for <2.1.8 */ {
+  opacity: 0;
+  transform: scale(0);
+}
+.list-enter-to {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.list-move {
+  opacity: 1;
+  transition: all 0.5s;
 }
 
 </style>

@@ -52,6 +52,10 @@ export const store = new Vuex.Store({
                 state: "idle",
                 message: null
             },
+            activate: {
+                state: 'idle',
+                message: null
+            },
             actions: {
                 actionDate: null
             },
@@ -92,6 +96,21 @@ export const store = new Vuex.Store({
         }
     },
     getters: {
+        isLogged(state) {
+            return state.user ? true : false;
+        },
+        isActivating(state) {
+            return state.appState.activate.state == 'activating' ? true : false;
+        },
+        isActivationError(state) {
+            return state.appState.activate.state == 'error' ? true : false;
+        },
+        isActivationSuccess(state) {
+            return state.appState.activate.state == 'success' ? true : false;
+        },
+        activationMessage(state) {
+            return state.appState.activate.message;
+        },
         isDayPicked(state) {
             return state.pickedDay ? true : false;
         },
@@ -220,9 +239,29 @@ export const store = new Vuex.Store({
         },
         yesterday: state => {
             return state.yesterday;
+        },
+        getLevel: state => {
+            var level = state.user.currentState.level;
+            return {
+                number: level.number,
+                currentExp: level.currentExp,
+                requiredExp: level.definition.requiredExp,
+                league: level.definition.league.name,
+                expPercent: level.currentExp / level.definition.requiredExp * 100
+            };
         }
     },
     mutations: {
+        startActivatingAccount: (state) => {
+            state.appState.activate.state = 'activating';
+        },
+        endActivatingAccount: (state) => {
+            state.appState.activate.state = 'success';
+        },
+        activatingAccountError: (state, message) => {
+            state.appState.activate.state = 'error';
+            state.appState.activate.message = message;
+        },
         changeLoginStatus: (state, newStatus) => {
             state.appState.login.state = newStatus;
         },
@@ -452,7 +491,7 @@ export const store = new Vuex.Store({
         showPopup: (context, content) => {
             context.commit('showPopup', content);
         },
-        hidePopup: (context) => {
+        hidePopupWindow: (context) => {
             context.commit('hidePopup');
         },
         logIn: (context, payload) => {
@@ -713,6 +752,32 @@ export const store = new Vuex.Store({
             })
             .catch(function (error) {
                 context.commit('endDeleteingTodoError', 'An error occured!');
+            });
+        },
+        activateAccount: (context, code) => {
+            context.commit("startActivatingAccount");
+
+            const options = {
+                method: 'POST',
+                url: config.api + '/Users/activateAccount',
+                data: { 
+                    secret: code
+                }
+            };
+            
+            axios(options)
+            .then(function (response) {
+                context.commit("endActivatingAccount");
+            })
+            .catch(function (error) {
+                if (error && error.response && error.response.data && error.response.data.errors && error.response.data.errors[0])
+                {
+                    context.commit('activatingAccountError', error.response.data.errors[0].message);
+                }
+                else
+                {
+                    context.commit('activatingAccountError', 'Unexpected error occured, please try again later. If problem persists please contact website administrator.');
+                }
             });
         },
         mockLogin: (context) => {

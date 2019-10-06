@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <md-toolbar md-theme="default" class="md-primary md-layout md-alignment-center-space-between">
+    <md-toolbar md-theme="default" class="md-primary md-layout md-alignment-center-space-between toolbar">
         <div class="md-layout-item md-size-70 align-left md-layout md-gutter">
-            <div class="md-layout-item md-size-35 align-left md-layout md-gutter">
-                <h1>Procrastination killer</h1>
+            <div class="md-layout-item md-size-35 align-left md-layout md-gutter md-display-1 logo-wrapper">
+                Procrastination killer
             </div>
             <div class="md-layout-item md-size-65 align-left md-layout md-gutter md-alignment-center-left">
-                <router-link to="/home"><md-button>Home</md-button></router-link>
-                <router-link to="/main"><md-button>Callendar</md-button></router-link>
-                <router-link to="/list"><md-button>Todo List</md-button></router-link>
-                <router-link to="/simpleView"><md-button>Dashboard</md-button></router-link>
-                <router-link to="/stats"><md-button>Charts</md-button></router-link>
+                <router-link to="/"><md-button>Home</md-button></router-link>
+                <router-link to="/calendar" v-if="canBeDisplayed('Calendar')"><md-button>Calendar</md-button></router-link>
+                <router-link to="/list" v-if="canBeDisplayed('List')"><md-button>Todo List</md-button></router-link>
+                <router-link to="/dashboard" v-if="canBeDisplayed('Dashboard')"><md-button>Dashboard</md-button></router-link>
+                <!--<router-link to="/charts" v-if="canBeDisplayed('Charts')"><md-button>Charts</md-button></router-link>-->
             </div>
         </div>
         <div class="md-layout-item md-size-30 align-right md-layout md-gutter md-alignment-center-right">
@@ -31,11 +31,10 @@
 
 <script>
 import '../Viewport.scss'
-import router from './router'
+import { router, requiresLogin} from './router'
 import Login from "./components/LoginComponent.vue"
 import SecretView from "./components/SecretView.vue"
 import PublicMainPage from "./components/PublicMainPage.vue"
-import MainView from "./components/MainViewComponent.vue"
 
 export default {
     name: 'app',
@@ -43,8 +42,7 @@ export default {
     components: {
         'login-component': Login,
         'secret-component': SecretView,
-        'index-public': PublicMainPage,
-        'main-view': MainView
+        'index-public': PublicMainPage
     },
     computed: {
         showLoginButton(){
@@ -64,6 +62,9 @@ export default {
         },
         currentUser(){
             return this.$store.getters.userName;
+        },
+        isLogged() {
+            return this.$store.getters.isLogged;
         }
     },
     watch: {
@@ -88,6 +89,19 @@ export default {
         },
         mockLogin: function() {
             this.$store.dispatch("mockLogin");
+        },
+        canBeDisplayed(component) {
+            const requires = requiresLogin.filter(e => e === component.length > 0);
+            if (requires && this.isLogged)
+            {
+                return true;
+            }
+            else if (requires && !this.isLogged)
+            {
+                return false;
+            }
+
+            return true;
         }
     },
     mounted: function() {
@@ -103,23 +117,23 @@ body{
     color: #555;
 }
 
-.view {
-    height: -webkit-fill-available;
-}
-
 .dark-nav{
     background-color: rgb(53, 53, 53);
     padding: 20px;
     margin-right: 0px;
 }
 
+.toolbar {
+    height: 8%;
+}
+
 .content{
-    height: -webkit-fill-available;
     color: aliceblue;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-image: url("./assets/motivational-bg.png");
+    /* background-image: url("./assets/motivational-bg.png"); */
+    background-color: #2196F3;
     background-size: cover;
-    margin-top: -15px;
+    height: 92%;
 }
 
 .loginApplet{
@@ -140,4 +154,9 @@ body{
     font-size: 1.5em;
     font-family: Ubuntu;
 }
+
+.logo-wrapper {
+    height: 100%;
+}
+
 </style>

@@ -98,6 +98,7 @@ export default {
 .main-card {
     height: 100%;
     margin: auto;
+    margin-top: 10%;
 }
 
 </style>

@@ -1,27 +1,34 @@
 <template>
-    <div v-if="isLoaded">
-        <md-card class="" v-on:click.native="showPopup">
-                <md-card-header>
-                    <div class="md-title">Recent rewards</div>
-                </md-card-header>
-                <md-card-content>
-                    <md-list class="md-dense">
-                        <reward v-for="event in events" v-bind:key="event.id" 
-                            v-bind:icon="getIcon(event.eventType)" 
-                            v-bind:text="event.eventType" 
-                            v-bind:points="event.points"
-                            v-bind:date="event.eventDate"> 
-                        </reward>
-                    </md-list>
-            </md-card-content>
-        </md-card>
-        <transition name="fade">
-            <popup-window v-if="showPopupWindow"></popup-window>
-        </transition>
-    </div>
-    <div v-else>
-        <loading-bar></loading-bar>
-    </div>
+    <md-card class="" v-on:click.native="showPopup">
+        <md-card-header>
+            <div class="md-title">Recent rewards</div>
+        </md-card-header>
+        <md-card-content>
+            <!-- <md-list class="md-dense" v-if="isLoaded">
+                <reward v-for="event in events" v-bind:key="event.id" 
+                    v-bind:icon="getIcon(event.eventType)" 
+                    v-bind:text="event.eventType" 
+                    v-bind:points="event.points"
+                    v-bind:date="event.eventDate"> 
+                </reward>
+            </md-list> -->
+            <md-table v-model="events" v-if="isLoaded" md-fixed-header>
+                <md-table-toolbar>
+                    <h1 class="md-title">Users</h1>
+                </md-table-toolbar>
+
+                <md-table-row slot="md-table-row" slot-scope="{ item }">
+                    <md-table-cell md-label="" md-sort-by="eventType" md-numeric><md-icon class="md-primary no-margin">{{getIcon(item.eventType)}}</md-icon></md-table-cell>
+                    <md-table-cell md-label="Aquired date" md-sort-by="eventDate">{{ item.eventDate }}</md-table-cell>
+                    <md-table-cell md-label="Type" md-sort-by="eventType">{{ item.eventType }}</md-table-cell>
+                    <md-table-cell md-label="Points" md-sort-by="points">{{ item.points }}</md-table-cell>
+                </md-table-row>
+            </md-table>
+            <div v-else>
+                <loading-bar></loading-bar>
+            </div>
+        </md-card-content>
+    </md-card>
 </template>
 
 
@@ -29,14 +36,12 @@
 import Loading from './LoadingBar.vue'
 import Reward from './RewardItem.vue'
 import * as moment from 'moment';
-import PopupWindow from './PopupWindow.vue'
 
 
 export default {
     components: {
         'loading-bar': Loading,
-        'reward': Reward,
-        'popup-window': PopupWindow
+        'reward': Reward
     },
     data() {
         return {
@@ -47,15 +52,15 @@ export default {
             return this.$store.getters.isEventsLoaded;
         },
         events() {
-            return this.$store.getters.getEvents.sort((x, y) => {
+            return this.$store.getters.getEvents.slice().sort((x, y) => {
                 return moment(x.eventDate).isAfter(moment(y.eventDate)) ? -1 : 1
-            }).slice(0, 4);
+            }).map(event => {
+                event.eventDate = this.getDate(event.eventDate);
+                return event;
+            });
         },
         allEents() {
-            return this.$store.getters.getEvents.sort((x, y) => moment(x.eventDate).diff(moment(y.eventDate), 'seconds') < 0);
-        },
-        showPopupWindow() {
-            return this.$store.getters.showPopup;
+            return this.$store.getters.getEvents.slice().sort((x, y) => moment(x.eventDate).diff(moment(y.eventDate), 'seconds') < 0);
         }
     },
     methods: {
@@ -65,9 +70,12 @@ export default {
             else if (eventType == "Todo completed")
                 return 'check'
         },
-        showPopup(content) {
-            this.$store.dispatch('showPopup', content);
+        showPopup() {
+            this.$store.dispatch('showPopup');
         },
+        getDate(date) {
+            return moment(date).format("DD-MM-YYYY hh:mm:ss");
+        }
     },
     mounted () {
         this.$store.dispatch('markAction', { 
@@ -86,5 +94,6 @@ export default {
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
+
 
 </style>

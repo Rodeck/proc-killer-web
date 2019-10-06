@@ -1,16 +1,14 @@
 <template>
     <div class="md-layout md-alignment-center wrapper md-gutter">
-        <div class="md-layout-item md-size-30">
-            <account></account>
-        </div>
-        <div class="md-layout-item md-size-30">
-            <mini-rewards></mini-rewards>
-        </div>
-        <div class="md-layout-item md-size-60">
+        <div class="md-layout-item md-size-90">
             <clostest-todos :key="todoKey"></clostest-todos>
+        </div>
+        <div class="md-layout-item md-size-90">
+            <mini-rewards></mini-rewards>
         </div>
         <transition name="fade">
             <add-todo v-if="showAddTodoWindow"></add-todo>
+            <popup-window v-if="showPopupWindow"></popup-window>
         </transition>
     </div>
 </template>
@@ -23,6 +21,7 @@ import Loading from './LoadingBar.vue'
 import ClostestTodos from './ClostestTodosComponent.vue'
 import AddTodo from './AddTodo.vue'
 import MiniRewards from './MiniRewardsComponent.vue'
+import PopupWindow from './PopupWindow.vue'
 
 export default {
     components: {
@@ -31,6 +30,7 @@ export default {
         'clostest-todos': ClostestTodos,
         'add-todo': AddTodo,
         'mini-rewards': MiniRewards,
+        'popup-window': PopupWindow
     },
     data() {
         return {
@@ -45,6 +45,9 @@ export default {
         },
         todoKey() {
             return this.$store.getters.clostestTodosKey;
+        },
+        showPopupWindow() {
+            return this.$store.getters.showPopup;
         }
     },
     methods: {
@@ -63,17 +66,11 @@ export default {
     overflow: hidden;
     position: relative;
     width: 100%;
+    height: 100%;
 }
 
-.content {
-    flex: 1 1 auto;
-    min-height: 80%;
-    max-height: 80%;
-}
-
-.scrollable {
-    max-height: 100%;
-    display: inline;
+.wrapper > div {
+    margin-top: 50px;
 }
 
 .fade-enter-active, .fade-leave-active {

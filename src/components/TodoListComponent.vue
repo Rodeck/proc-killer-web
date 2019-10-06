@@ -40,7 +40,7 @@
                     <div v-for="day in getDays" :key="day.date" class="single-day md-layout">
                         <md-card md-with-hover class="md-layout-item md-size-100" :class="{'md-elevation-20': isToday(day.date)}">
                             <md-card-content class="md-layout">
-                                <div class="md-layout-item md-size-10" :class="{'md-title': day.todos.length > 0}">
+                                <div class="md-layout-item md-size-10" :class="{'md-title': day.todos && day.todos.length > 0}">
                                 {{formatDate(day.date)}}
                                 </div>
                                 <div class="md-layout-item md-size-85"> 
@@ -98,8 +98,8 @@
                         <md-card md-with-hover class="md-layout-item md-size-100">
                             <md-card-content class="md-layout">
                                 <div class="md-layout-item md-size-100" style="text-align: center">
-                                    <md-button v-for="(idx, page) in pagesCount" :key="page" class="md-icon-button md-primary" v-on:click="switchPage(idx)">
-                                        {{idx}}
+                                    <md-button v-for="(page, idx) in pagesCount" :key="idx" :class="{'current-page': isCurrentPage(idx)}"  class="md-icon-button md-primary" v-on:click="switchPage(idx)">
+                                        {{idx+1}}
                                     </md-button>
                                 </div>
                             </md-card-content>
@@ -141,7 +141,7 @@ export default {
     computed: {
         pagesCount() 
         {
-            return this.days.length / this.daysPerPage;
+            return  this.days.slice(0, this.days.length / this.daysPerPage);
         },
         page() {
             return parseInt(this.pageModel);
@@ -168,6 +168,9 @@ export default {
     watch: { 
     },
     methods: {
+        isCurrentPage(idx) {
+            return idx == this.page;
+        },
         switchPage(page) {
             this.pageModel = page;
         },
@@ -211,10 +214,6 @@ export default {
 
 <style scoped>
 
-.wrapper {
-    margin-top: 3%;
-}
-
 .single-day {
     margin: 5px;
 }
@@ -241,6 +240,15 @@ export default {
 .list-move {
   opacity: 1;
   transition: all 0.5s;
+}
+
+.wrapper {
+    margin-top: 3%;
+}
+
+.current-page {
+    border-bottom: 2px;
+    border-style: solid;
 }
 
 </style>

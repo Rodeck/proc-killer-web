@@ -7,7 +7,7 @@
                     <i class="material-icons" v-on:click="hideWindow">close</i>
                 </div>
             </md-toolbar>
-            <rewards v-if="isRewardsPicked" class="md-layout-item md-size-100"></rewards>
+            <!-- <rewards v-if="isRewardsPicked" class="md-layout-item md-size-100"></rewards> -->
         </div>
     </md-content>
 </template>
@@ -37,7 +37,7 @@ export default {
     },
     methods: {
         hideWindow() {
-            this.$store.dispatch('hidePopup');
+            this.$store.dispatch('hidePopupWindow');
         }
     }
 }
@@ -47,10 +47,10 @@ export default {
 .popup-container {
     width: 80%;
     height: 80%;
-    position: absolute;
+    position: fixed;
     z-index: 10;
     left: 10%;
-    top: 5%;
+    top: 10%;
 }
 
 .close-button-div {

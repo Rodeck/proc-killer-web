@@ -1,6 +1,6 @@
 <template>
     <div class="md-layout md-alignment-center-left wrapper md-gutter home-container">
-        <div class="md-layout-item md-size-45">
+        <div class="md-layout-item md-size-45 actions-card">
             <md-card>
                 <md-card-header>
                     <div class="md-title">Please, review those actions:</div>
@@ -72,6 +72,10 @@ export default {
 
 .home-container {
     margin-left: 5%;
+}
+
+.actions-card {
+    margin-top: 10%;
 }
 
 </style>

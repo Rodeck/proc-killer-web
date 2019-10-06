@@ -1,16 +1,16 @@
 <template>
     <div>
-        <main-view></main-view>
+        <calendar-view></calendar-view>
     </div>
 </template>
 
 <script>
 
-import MainView from './MainViewComponent.vue'
+import CalendarView from './CalendarComponent.vue'
 
 export default {
     components: {
-        'main-view': MainView
+        'calendar-view': CalendarView
     },
     data() {
         return {

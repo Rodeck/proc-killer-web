@@ -4,7 +4,8 @@
                 <div class="md-title">Account</div>
             </md-card-header>
             <md-card-content>
-                <md-list class="md-dense" v-if="isLoaded">
+                <div v-if="isLoaded" class="md-layout">
+                <md-list class="md-dense md-layout-item md-size-30">
                     <md-list-item>
                         <md-icon>account_circle</md-icon>
                         <span class="md-list-item-text">{{user.username}}</span>
@@ -25,6 +26,19 @@
                         <md-tooltip md-direction="top">Total todos completed</md-tooltip>
                     </md-list-item>
                 </md-list>
+                <div class="md-layout-item md-size-70 md-layout level-wrapper">
+                    <div class="md-layout-item md-size-100 md-layout">
+                        <div class="md-layout-item md-size-100 md-display-1 league-info">
+                            {{levelInfo.league}}
+                        </div>
+                    </div>
+                    <div class="progress-bar-container md-layout-item md-size-80">
+                        <p class="currentExp" :style="{left: levelInfo.expPercent + '%'}"> {{levelInfo.currentExp}}</p>
+                        <p class="currentExp" :style="{left: 100 + '%'}"> {{levelInfo.requiredExp}}</p>
+                        <md-progress-bar md-mode="determinate" :md-value="levelInfo.expPercent"></md-progress-bar>
+                    </div>
+                </div>
+                </div>
                 <div v-else>
                     <loading-bar></loading-bar>
                 </div>
@@ -54,6 +68,9 @@ export default {
         },
         user() {
             return this.$store.getters.user;
+        },
+        levelInfo() {
+            return this.$store.getters.getLevel;
         }
     },
     methods: {
@@ -65,5 +82,22 @@ export default {
 
 <style scoped>
 
+.currentExp {
+    margin: 0px;
+    display: inline;
+    position: relative;
+}
+
+.level-number {
+    background-color: red;
+}
+
+.league-info {
+    text-align: center;
+}
+
+.level-wrapper {
+    border: 5px solid #000000;
+}
 
 </style>

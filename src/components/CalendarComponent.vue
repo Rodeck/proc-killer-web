@@ -7,20 +7,10 @@
         <md-card class="md-layout-item md-size-80" id="callendar">
             <md-card-content class="md-layout md-gutter">
                 <div class="md-layout-item md-size-100">
-                    <div class="md-layout md-gutter md-alignment-center-center">
-                        <div class="md-layout-item md-size-15">
-                            <md-button>
-                                <md-icon class="inline">arrow_left</md-icon>
-                            </md-button>
-                        </div>
-                        <div class="md-layout-item md-size-20 month-title-container">
-                            <span class="md-display-3 month-title">May</span>
-                        </div>
-                        <div class="md-layout-item md-size-15">
-                            <md-button>
-                                <md-icon class="inline">arrow_right</md-icon>
-                            </md-button>
-                        </div>
+                    <div class="month-title-wrapper">
+                        <span class="month-title md-display-3">
+                            {{getMonth}}
+                        </span>
                     </div>
                 </div>
                 <div class="md-layout-item md-size-100">
@@ -105,7 +95,7 @@ export default {
     data() {
         return {
             date: "",
-            rows: [ {no: 0}, {no: 1}, {no: 2}, {no: 3}, {no: 4}],
+            rows: [ {no: 0}, {no: 1}, {no: 2}, {no: 3}, {no: 4}, {no: 5}],
             showControll: false,
             allDays: null,
             filledDays: false,
@@ -114,7 +104,8 @@ export default {
             tomorrow: Object,
             chartSize: Number,
             chartHeight: Number,
-            isMounted: false
+            isMounted: false,
+            pickedMonth: null
         }
     },
     computed: {
@@ -141,6 +132,15 @@ export default {
         },
         pickedDay() {
             return this.$store.getters.pickedDay;
+        },
+        getMonth() {
+            if (this.pickedMonth) {
+                return this.pickedMonth;
+            }
+            else
+            {
+                return moment().format('MMMM');
+            }
         }
     },
     watch: {
@@ -203,7 +203,8 @@ export default {
             this.filledDays = false;
             var daysInMonth = moment().daysInMonth();
             const startOfMonth = moment().startOf('month');
-            var dow = startOfMonth.day() - 1;
+            console.log("Start of month: ", startOfMonth.day());
+            var dow = startOfMonth.day() == 0 ? 6 : startOfMonth.day()- 1;
             var days = new Array();
 
             for (var no=0;no < dow; no++) {
@@ -265,6 +266,14 @@ export default {
 </script>
 
 <style scoped>
+
+.month-title-wrapper {
+    text-align: center;
+}
+
+.month-title {
+    display: inline;
+}
 
 .more-list-item {
     text-align: center !important;
@@ -345,11 +354,6 @@ export default {
     top: 0px;
 }
 
-.month-title-container {
-    text-align: center;
-    margin-bottom: 1.5%;
-}
-
 .inline {
     display: -webkit-inline-box;
 }
@@ -358,12 +362,6 @@ export default {
     position: relative;
     left: -50px;
     top: -20px;
-}
-
-.month-title{ 
-    margin: 0 auto;
-    display: inline-block;
-    width: 100px;
 }
 
 .deactivatedDay {
@@ -402,7 +400,7 @@ export default {
 
 .view-content {
     width: 100%;
-    margin-top: 0.5%;
+    height: 100%;
 }
 
 .close-button-div i {

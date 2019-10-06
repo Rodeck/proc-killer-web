@@ -15,7 +15,7 @@
         <textarea class="form-control" rows="5" id="comment" placeholder="What needs to be done?" v-model="description"></textarea>
 
         <!-- Subject -->
-        <input type="text" id="defaultContactFormName" class="form-control mb-4 date-field" v-model="date" readonly>
+        <input type="text" id="defaultContactFormName" class="form-control mb-4 date-field" v-model="formattedData" readonly>
 
         <div class="alert alert-danger" v-if="showErrorMsg">
             <span class="h4 error-msg">{{errorMessage}}</span>
@@ -48,8 +48,11 @@ export default {
         errorMessage() {
             return this.$store.state.addingTodoErrorMessage;
         },
-        date() {
+        formattedData() {
             return moment(this.$store.getters.pickedDayDate).format('DD-MM-YYYY');
+        },
+        date() {
+            return moment(this.$store.getters.pickedDayDate);
         }
     },
     methods: {

@@ -9,7 +9,7 @@ import createPersistedState from 'vuex-persistedstate'
 Vue.use(Vuex);
 
 var config = {
-    api: "https://localhost:44390/api"
+    api: "https://localhost:44390/api" //"http://proc-killer-api-test.eu-west-1.elasticbeanstalk.com/api"
 }
 
 function authHeader() {
@@ -63,6 +63,14 @@ export const store = new Vuex.Store({
                 state: "notLoaded",
                 message: null
             },
+            ranking: {
+                state: "notLoaded",
+                message: null
+            },
+            rewards: {
+                state: "notLoaded",
+                message: null
+            },
             callendar: {
                 state: "notLoaded",
                 message: null
@@ -96,6 +104,12 @@ export const store = new Vuex.Store({
         }
     },
     getters: {
+        ranking: state => state.ranking,
+        aquiredRewards: state => state.rewards.filter(x => x.isFulfiled),
+        lockedRewards: state => state.rewards.filter(x => !x.isFulfiled),
+        rankingLoaded(state) {
+            return state.appState.ranking.state == 'loaded';
+        },
         isLogged(state) {
             return state.user ? true : false;
         },
@@ -297,6 +311,12 @@ export const store = new Vuex.Store({
         startLoadingEvents: (state) => {
             state.appState.events.state = 'loading';
         },
+        startLoadingRewards: (state) => {
+            state.appState.rewards.state = 'loading';
+        },
+        startLoadingRanking: (state) => {
+            state.appState.ranking.state = 'loading';
+        },
         loadingDataSuccess: (state, data) => { 
             state.callendar = data;
 
@@ -355,6 +375,14 @@ export const store = new Vuex.Store({
         loadingEventsSuccess: (state, data) => { 
             state.events = data;
             state.appState.events.state = 'loaded';
+        },
+        loadingRewardsSuccess: (state, data) => { 
+            state.rewards = data;
+            state.appState.rewards.state = 'loaded';
+        },
+        loadingRankingSuccess: (state, data) => { 
+            state.ranking = data;
+            state.appState.ranking.state = 'loaded';
         },
         displayAddTodoWindow: (state) => {
             state.appState.addingTodo.showWindow = true;
@@ -497,7 +525,7 @@ export const store = new Vuex.Store({
         logIn: (context, payload) => {
             // use payload pass and login
             context.commit('changeLoginStatus', "logginIn");
-
+            console.log(config.api);
             axios.post(config.api + '/Users/authenticate', {
                 Username: payload.username,
                 Password: payload.password
@@ -580,6 +608,7 @@ export const store = new Vuex.Store({
                 {
                     context.commit('loadingDataSuccess', response.data.result);
                     context.dispatch('loadEvents');
+                    context.dispatch('loadRewards');
                 }
                 else
                 {
@@ -612,6 +641,54 @@ export const store = new Vuex.Store({
             })
             .catch(function (error) {
                 context.commit('loadingEventsFailed');
+            });
+        },
+        loadRewards: (context) => {
+            context.commit('startLoadingRewards');
+
+            const options = {
+                method: 'GET',
+                headers : authHeader(),
+                url: config.api + '/Rewards/'
+            };
+
+            axios(options)
+            .then(function (response) {
+                if (response.data)
+                {
+                    context.commit('loadingRewardsSuccess', response.data);
+                }
+                else
+                {
+                    context.commit('loadingRewardsFailed');
+                }
+            })
+            .catch(function (error) {
+                context.commit('loadingRewardsFailed');
+            });
+        },
+        loadRanking: (context) => {
+            context.commit('startLoadingRanking');
+
+            const options = {
+                method: 'GET',
+                headers : authHeader(),
+                url: config.api + '/Statistics/'
+            };
+
+            axios(options)
+            .then(function (response) {
+                if (response.data)
+                {
+                    context.commit('loadingRankingSuccess', response.data);
+                }
+                else
+                {
+                    context.commit('loadingRankingFailed');
+                }
+            })
+            .catch(function (error) {
+                context.commit('loadingRankingFailed');
             });
         },
         loadChartData: (context, chart) => {
@@ -736,12 +813,16 @@ export const store = new Vuex.Store({
         },
         deleteTodo: (context) => {
 
+            context.dispatch('deleteTodoById', context.state.todoToDelete);
+        },
+        deleteTodoById: (context, id) => {
+
             context.commit("startDeletingTodo")
 
             const options = {
                 method: 'DELETE',
                 headers : authHeader(),
-                url: config.api + '/Todo/deleteTodo/'+ context.state.user.id + "/" + context.state.todoToDelete,
+                url: config.api + '/Todo/deleteTodo/'+ context.state.user.id + "/" + id,
             };
 
             axios(options)

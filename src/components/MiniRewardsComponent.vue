@@ -1,8 +1,5 @@
 <template>
-    <md-card class="" v-on:click.native="showPopup">
-        <md-card-header>
-            <div class="md-title">Recent rewards</div>
-        </md-card-header>
+    <md-card class="md-primary" v-on:click.native="showPopup">
         <md-card-content>
             <!-- <md-list class="md-dense" v-if="isLoaded">
                 <reward v-for="event in events" v-bind:key="event.id" 
@@ -12,11 +9,7 @@
                     v-bind:date="event.eventDate"> 
                 </reward>
             </md-list> -->
-            <md-table v-model="events" v-if="isLoaded" md-fixed-header>
-                <md-table-toolbar>
-                    <h1 class="md-title">Users</h1>
-                </md-table-toolbar>
-
+            <md-table v-model="events" v-if="isLoaded" md-fixed-header class="md-primary">
                 <md-table-row slot="md-table-row" slot-scope="{ item }">
                     <md-table-cell md-label="" md-sort-by="eventType" md-numeric><md-icon class="md-primary no-margin">{{getIcon(item.eventType)}}</md-icon></md-table-cell>
                     <md-table-cell md-label="Aquired date" md-sort-by="eventDate">{{ item.eventDate }}</md-table-cell>
@@ -55,6 +48,7 @@ export default {
             return this.$store.getters.getEvents.slice().sort((x, y) => {
                 return moment(x.eventDate).isAfter(moment(y.eventDate)) ? -1 : 1
             }).map(event => {
+                console.log(event.eventDate);
                 event.eventDate = this.getDate(event.eventDate);
                 return event;
             });

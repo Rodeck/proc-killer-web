@@ -1,8 +1,5 @@
 <template>
-<md-card>
-    <md-card-header>
-        <div class="md-title">Clostest todos</div>
-    </md-card-header>
+<md-card class="md-primary">
     <md-card-content class="md-layout md-gutter" v-if="isDataLoaded">
         <div class="md-layout-item md-size-33">
             <todo v-bind:day="yesterday"></todo>

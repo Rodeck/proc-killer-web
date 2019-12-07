@@ -1,22 +1,34 @@
 <template>
-  <div id="app">
-    <md-toolbar md-theme="default" class="md-primary md-layout md-alignment-center-space-between toolbar">
+  <div id="app" class="background">
+    <md-toolbar class="md-primary md-layout md-alignment-center-space-between toolbar">
         <div class="md-layout-item md-size-70 align-left md-layout md-gutter">
-            <div class="md-layout-item md-size-35 align-left md-layout md-gutter md-display-1 logo-wrapper">
+            <div class="md-layout-item md-size-35 align-left md-layout md-gutter md-display-2 logo-wrapper">
                 Procrastination killer
             </div>
-            <div class="md-layout-item md-size-65 align-left md-layout md-gutter md-alignment-center-left">
-                <router-link to="/"><md-button>Home</md-button></router-link>
-                <router-link to="/calendar" v-if="canBeDisplayed('Calendar')"><md-button>Calendar</md-button></router-link>
-                <router-link to="/list" v-if="canBeDisplayed('List')"><md-button>Todo List</md-button></router-link>
-                <router-link to="/dashboard" v-if="canBeDisplayed('Dashboard')"><md-button>Dashboard</md-button></router-link>
+            <div class="md-layout-item md-size-40 align-left md-layout md-gutter md-alignment-center-left">
+                <router-link to="/" v-if="!isLogged" :class="{ current: currentView == '' }"><md-button>Home</md-button></router-link>
+                <router-link to="/home" v-else :class="{ current: currentView == 'home'}"><md-button>Home</md-button></router-link>
+                <router-link to="/calendar" v-if="canBeDisplayed('Calendar')" :class="{ current: currentView == 'calendar'}"><md-button>Calendar</md-button></router-link>
+                <!-- <router-link to="/list" v-if="canBeDisplayed('List')" :class="{ current: currentView == 'list'}"><md-button>Todo List</md-button></router-link> -->
+                <router-link to="/dashboard" v-if="canBeDisplayed('Dashboard')" :class="{ current: currentView == 'dashboard'}"><md-button>Dashboard</md-button></router-link>
+                <router-link to="/ranking" v-if="canBeDisplayed('Ranking')" :class="{ current: currentView == 'ranking'}"><md-button>Ranking</md-button></router-link>
                 <!--<router-link to="/charts" v-if="canBeDisplayed('Charts')"><md-button>Charts</md-button></router-link>-->
             </div>
         </div>
-        <div class="md-layout-item md-size-30 align-right md-layout md-gutter md-alignment-center-right">
-            <md-button class="md-accent" md-theme="default" v-on:click="changeLogin">{{ loginButtonText }}</md-button>
-            <span v-if="showSecret" class="username">Hello {{ currentUser }}</span>
-        </div>
+        <md-menu md-align-trigger>
+            <md-button class="md-icon-button" md-menu-trigger>
+                <md-icon>account_circle</md-icon>
+            </md-button>
+
+            <md-menu-content>
+                <md-menu-item>
+                    <md-button v-on:click="changeLogin">Settings</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button class="md-accent" v-on:click="changeLogin">{{ loginButtonText }}</md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu>
     </md-toolbar>
     <div class="content">
         <transition name="fade" mode="out-in">
@@ -45,6 +57,9 @@ export default {
         'index-public': PublicMainPage
     },
     computed: {
+        currentView() {
+            return this.$route.fullPath.replace('/', '');
+        },
         showLoginButton(){
             return this.$store.getters.showLoginButton;
         },
@@ -117,21 +132,22 @@ body{
     color: #555;
 }
 
-.dark-nav{
-    background-color: rgb(53, 53, 53);
-    padding: 20px;
-    margin-right: 0px;
+.background {
+    background-color: rgb(92, 93, 134);
 }
 
 .toolbar {
     height: 8%;
 }
 
+.current {
+    border-bottom: 2px solid black;
+}
+
 .content{
     color: aliceblue;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     /* background-image: url("./assets/motivational-bg.png"); */
-    background-color: #2196F3;
     background-size: cover;
     height: 92%;
 }

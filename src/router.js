@@ -6,6 +6,7 @@ import LoginHome from "./components/LoginHomeComponent.vue"
 import Statistics from './components/MiniChartsComponent.vue'
 import List from './components/TodoListComponent.vue'
 import Activate from './components/ActivateAccount.vue'
+import Ranking from './components/RankingComponent.vue'
 import Vue from 'vue'
 
 Vue.use(Router)
@@ -30,8 +31,8 @@ export const router = new Router({
     },
     {
       path: '/home',
-      name: 'LoginHome',
-      component: LoginHome
+      name: 'List',
+      component: List
     },
     {
       path: '/charts',
@@ -44,6 +45,11 @@ export const router = new Router({
       component: List
     },
     {
+      path: '/ranking',
+      name: 'Ranking',
+      component: Ranking
+    },
+    {
       path: '/activate/:secret',
       name: 'ActivateAccount',
       component: Activate
@@ -53,7 +59,7 @@ export const router = new Router({
 
 Vue.router = router;
 
-export let requiresLogin = ["Calendar", 'Dashboard', 'LoginHome', 'Charts', 'List'];
+export let requiresLogin = ["Calendar", 'Dashboard', 'LoginHome', 'Charts', 'List', 'Ranking'];
 
 router.beforeEach((to, from, next) => {
   if (requiresLogin.some(e => e == to.name) && !localStorage.getItem("token")) {

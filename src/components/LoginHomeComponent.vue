@@ -72,6 +72,7 @@ export default {
 
 .home-container {
     margin-left: 5%;
+    margin-right: 0px;
 }
 
 .actions-card {

@@ -1,13 +1,13 @@
 <template>
-    <md-card class="md-layout-item md-size-30" md-with-hover v-on:click.native="goToView">
-        <md-card-content class="md-layout md-alignment-center-center wrapper md-gutter" :click="goToView">
-            <div class="md-title md-layout-item md-size-80">{{actionDescription}}</div>
+    <div class="md-layout-item md-size-20" v-on:click="goToView">
+        <div class="md-layout md-alignment-center-center wrapper md-gutter" :click="goToView">
+            <div class="md-layout-item md-size-80 md-body-2">{{actionDescription}}</div>
             <div class="md-layout-item md-size-20">
                 <md-icon v-if="isCompleted">check_box</md-icon>
                 <md-icon v-else>check_box_outline_blank</md-icon>
             </div>
-        </md-card-content>
-    </md-card>
+        </div>
+    </div>
 </template>
 
 <script>

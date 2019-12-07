@@ -4,7 +4,7 @@
             <add-todo v-if="showAddTodoWindow"></add-todo>
             <day-popup v-if="isDayPicked" :day="pickedDay" :key="viewKey"></day-popup>
         </transition>
-        <md-card class="md-layout-item md-size-80" id="callendar">
+        <md-card class="md-layout-item md-size-80 md-primary wrapper" id="callendar">
             <md-card-content class="md-layout md-gutter">
                 <div class="md-layout-item md-size-100">
                     <div class="month-title-wrapper">
@@ -535,6 +535,10 @@ box-shadow: -10px 0px 26px 0px rgba(0,0,0,0.75);
 
 .delete-buttons button{
     margin-right: 10px;
+}
+
+.wrapper {
+    margin-top: 3%;
 }
 
 </style>

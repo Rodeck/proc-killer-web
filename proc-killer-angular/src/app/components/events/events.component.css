@@ -1,0 +1,9 @@
+.component-wrapper {
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 80%;
+}
+
+.points-value {
+    font-weight: 1000;
+}

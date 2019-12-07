@@ -1,0 +1,33 @@
+<div *ngIf="date$ | async as date">
+    <div class="modal-header">
+    <h4 class="modal-title">{{dateService.onlyDate(date)}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+    <div class="row">
+        <div class="col">
+            <div class="row title-wrapper">
+                <div class="col-11">
+                    <input type="email" class="form-control" id="title" placeholder="Title" [(ngModel)]="title">
+                </div>
+                <div class="col-1">
+                    <i class="far fa-star large-icon"></i>
+                </div>
+            </div>
+            <div class="form-group">
+                <textarea class="form-control" id="description" rows="3" placeholder="Description" [(ngModel)]="description"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button class="btn btn-success" (click)="addTodo(date)">Add</button>
+        </div>
+    </div>
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="activeModal.dismiss('Cross click')">Close</button>
+    </div>
+</div>

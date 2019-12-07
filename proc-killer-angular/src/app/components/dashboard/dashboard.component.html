@@ -1,0 +1,46 @@
+<!-- Sidebar navigation -->
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-2 d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <div class="logo-wrapper">
+          <a class="logo-el" routerLink="/dashboard">
+            <img class="brand-logo" src="assets/logo.png">
+          </a>
+        </div>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" (click)="actiavateComponent('list')">
+                <i class="fas fa-tasks"></i>Tasks
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="actiavateComponent('profile')">
+              <i class="fas fa-user"></i>User Profile
+            </a>
+          </li>
+          <!-- Calling SignOut() Api from AuthService -->
+          <li class="nav-item">
+            <a class="nav-link" (click)="logOut()">
+              <i class="fas fa-sign-out-alt"></i>Log out
+            </a>
+          </li>
+        </ul>
+        <app-events></app-events>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+      <div class="inner-adjust">
+        <div *ngIf="activeComponent == 'profile'">
+          <app-user-profile></app-user-profile>
+        </div>
+        <div *ngIf="activeComponent == 'list'">
+          <app-list></app-list>
+        </div>
+      </div>
+    </main>
+
+  </div>
+</div>

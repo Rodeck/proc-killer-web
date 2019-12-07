@@ -1,0 +1,13 @@
+.large-icon {
+    font-size: 200%;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.large-icon:hover {
+    background-color: rgb(228, 231, 52);
+}
+
+.title-wrapper {
+    margin-bottom: 5px;
+}

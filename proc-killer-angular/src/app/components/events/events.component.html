@@ -1,0 +1,32 @@
+<div class="row component-wrapper">
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                <h3>Recent rewards</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <tbody>
+                        <tr *ngFor="let event of events$ | async">
+                            <td>{{dateService.onlyDate(event.eventDate)}}</td>
+                            <td>{{event.eventType}}</td>
+                            <td class="text-success points-value">+{{event.points}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center">
+                <h3>...</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center">
+                <button class="btn btn-success">Show more</button>
+            </div>
+        </div>
+    </div>
+</div>

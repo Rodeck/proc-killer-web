@@ -1,0 +1,42 @@
+.selected-day-wrapper {
+    padding: 30px;
+}
+
+.day-header {
+    border-right: 2px solid;
+}
+
+.inline-link {
+    cursor: pointer;
+    color: rgb(128, 180, 128);
+    font-weight: 1000;
+}
+
+.days-panel {
+    margin-bottom: 20px;
+}
+
+.day-button {
+    padding: 20px;
+    margin-right: 20px;
+}
+
+.checkbox {
+    cursor: pointer;
+}
+
+.checkbox:hover {
+    -webkit-box-shadow: 5px 3px 37px 5px rgba(0,0,0,0.27);
+    -moz-box-shadow: 5px 3px 37px 5px rgba(0,0,0,0.27);
+    box-shadow: 5px 3px 37px 5px rgba(0,0,0,0.27);
+}
+
+.content-wrapper {
+    height: calc(100vh - 230px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.center-inline {
+    display: inline-block;
+}

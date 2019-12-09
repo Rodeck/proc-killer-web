@@ -36,6 +36,7 @@ import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { ListComponent } from './components/list/list.component';
 import { AddTodoComponent } from './components/add-todo/add-todo.component';
 import { EventsComponent } from './components/events/events.component';
+import { FriendsComponent } from './components/friends/friends.component';
 
 
 @NgModule({
@@ -49,7 +50,8 @@ import { EventsComponent } from './components/events/events.component';
     UserProfileComponent,
     ListComponent,
     AddTodoComponent,
-    EventsComponent
+    EventsComponent,
+    FriendsComponent
   ],
   imports: [
     BrowserModule,

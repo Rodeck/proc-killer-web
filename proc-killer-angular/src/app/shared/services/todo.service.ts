@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Day } from 'src/app/models/day.model';
+import { Day, Todo } from 'src/app/models/day.model';
 import { Observable } from 'rxjs';
 import { EventModel } from 'src/app/models/event-model.model';
 
@@ -41,5 +41,13 @@ export class TodoService {
 
   loadEvents(): Observable<EventModel[]> {
     return this.http.get<EventModel[]>(this.url + 'getEvents');
+  }
+
+  loadUnfinished(): Observable<Todo[]> {
+    return this.http.get<Todo[]>(this.baseUrl + 'Todo/loadUnfinished');
+  }
+
+  completeOverdueTodo(todoId: number): Observable<any> {
+    return this.http.post<any>(this.baseUrl + 'Todo/completeUnfinished?todoId=' + todoId, {});
   }
 }

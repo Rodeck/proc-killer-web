@@ -1,8 +1,11 @@
 import { UserModel } from 'src/app/models/user.model';
 import { MeetingPlace } from 'src/app/models/meeting-place.model';
 import { Category } from 'src/app/models/category.model';
-import { Day } from 'src/app/models/day.model';
+import { Day, Todo } from 'src/app/models/day.model';
 import { EventModel } from 'src/app/models/event-model.model';
+import { State } from '@ngrx/store';
+import { UserState } from 'src/app/models/user-state.model';
+import { AppUser } from 'src/app/models/app-user.model';
 
 export interface AppState {
     user: UserModel;
@@ -11,6 +14,10 @@ export interface AppState {
     addTodoDate?: Date;
     lastAddTodoDate: Date;
     events?: EventModel[];
+    unfinishedTodos?: Todo[]
+    userState?: UserState
+    friends?: AppUser[],
+    users?: AppUser[]
 };
 
 export const initialState: AppState = retrieveState() !== null ? retrieveState() : 

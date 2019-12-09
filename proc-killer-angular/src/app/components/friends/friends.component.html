@@ -1,0 +1,51 @@
+<div class="row">
+    <h1>Friends</h1>
+</div>
+<div class="row">
+    <div *ngIf="friendsList > 0" class="col">
+
+        <table class="table table-borderless">
+        <tbody>
+            <tr *ngFor='let friend of friends$ | async let i = index'>
+                <th scope="row">{{i+1}}</th>
+                <td>{{user.name}}</td>
+                <td><span class="font-weight-bold">{{user.level}}</span> LvL</td>
+                <td><span class="font-weight-bold">{{user.points}}</span> Points</td>
+                <td>
+                    <button class="btn btn-success">View</button>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+
+    </div>
+    <div *ngIf="friendsList === 0" class="col bg-danger p-3 m-4">
+        <h3>You have no friends yet, invite someone so you can get more points!</h3>
+    </div>
+</div>
+<div class="row divider"></div>
+<div class="row">
+    <div class="col">
+        <h3>Invite friends</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+
+        <table class="table table-borderless">
+        <tbody>
+            <tr *ngFor='let user of users$ | async let i = index'>
+                <th scope="row">{{i+1}}</th>
+                <td>{{user.name}}</td>
+                <td><span class="font-weight-bold">{{user.level}}</span> LvL</td>
+                <td><span class="font-weight-bold">{{user.points}}</span> Points</td>
+                <td>
+                    <i *ngIf="!user.isFriend" class="fas fa-user-plus"></i>
+                    <i *ngIf="user.isFriend" class="fas fa-user-minus"></i>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+
+    </div>
+</div>

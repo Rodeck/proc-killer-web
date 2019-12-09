@@ -12,3 +12,7 @@
 .logo-el {
     display: block;
 }
+
+.nav-link {
+    padding: 10px;
+}

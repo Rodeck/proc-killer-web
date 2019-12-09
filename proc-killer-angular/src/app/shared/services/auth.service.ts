@@ -9,10 +9,12 @@ import { UserModel } from 'src/app/models/user.model';
 import { Observable } from 'rxjs';
 import { map, take } from "rxjs/operators";
 import { AppState, BaseState } from 'src/app/store/state/app.state';
-import { Store, select } from '@ngrx/store';
+import { Store, select, State } from '@ngrx/store';
 import { userLoggedIn } from 'src/app/store/actions/app.actions';
 import { selectAppState } from 'src/app/store/selectors/app.selectors';
 import { UserRegistration } from 'src/app/models/user-registration.model';
+import { UserState } from 'src/app/models/user-state.model';
+import { AppUser } from 'src/app/models/app-user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -203,5 +205,21 @@ export class AuthService {
   saveUserInLocalStorage(user: firebase.User, token: string) {
     localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('token', token);
+  }
+
+  authenticate(): Observable<object> {
+    return this.http.post(this.url + '/authenticate', {});
+  }
+
+  loadState(): Observable<UserState> {
+    return this.http.get<UserState>(this.url + '/getState');
+  }
+
+  loadUsers(): Observable<AppUser[]> {
+    return this.http.get<AppUser[]>(this.url + '/getUsers');
+  }
+
+  getFriends(): Observable<AppUser[]> {
+    return this.http.get<AppUser[]>(this.url + '/getFriends');
   }
 }

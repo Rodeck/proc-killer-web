@@ -1,17 +1,59 @@
-<div class="pt-3 pb-2 mb-3 border-bottom">
+<div class="pt-3 pb-2 mb-5 border-bottom">
     <h1>User Profile </h1>
 </div>
 <!-- Show user data when logged in -->
 <div class="row" *ngIf="user$ | async; let user">
-<div class="col-md-12">
-    <div class="media">
-    <img class="align-self-start mr-5 img-thumbnail rounded-circle" src="{{(user.imageUrl) ? user.imageUrl : '/assets/dummy-user.png'}}"
-        alt="{{user.displayName}}">
-    <div class="media-body">
-        <h1>Hello: <strong>{{user.firstName}}</strong></h1>
-        <p>User ID: <strong>{{user.uid}}</strong></p>
-        <p>Email: <strong>{{user.email}}</strong></p>
+    <div class="col-md-12" *ngIf="userState$ | async; let userState">
+        <div class="media">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 image-container border">
+                        <div class="row">
+                            <div class="col-12">
+                                <img src="{{(user.imageUrl) ? user.imageUrl : '/assets/dummy-user.png'}}" alt="" class="user-image" style="width:400px;height:400px;" id="user-img">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 border">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="points-container">
+                                            <img src="/assets/points.png" alt="" class="img-circle" style="width:75px;">
+                                            <p class="centered">{{userState.points}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p style="text-align:center;font-size: smaller;"><strong>{{userState.level.number}} LvL</strong></p>
+                                <div class="row justify-content-md-center">
+                                    <div class="col-11">
+                                        <div class="points-container">
+                                            <div class="progress">
+                                                <div class="progress-bar" class="bg-success" [ngStyle]="getProgressBarStyle()">
+                                                    <div class="progress-value">{{userState.level.currentExp}}/{{userState.level.requiredExp}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4 left" style="text-align:center;overflow-wrap: break-word;">
+                                        <h4><p style="text-align: center;"><strong>{{userState.dailyLogins}}</strong></p></h4>           
+                                        <p><small class="label label-success">Daily logins</small></p>
+                                    </div>
+                                    <div class=" col-lg-4 left" style="text-align:center;overflow-wrap: break-word;">
+                                        <h4><p style="text-align: center;"><strong>{{userState.weeklyLogins}}</strong></p></h4>                   
+                                        <p> <small class="label label-warning">Weekly logins</small></p>
+                                    </div>
+                                    <div class=" col-lg-4 left" style="text-align:center;overflow-wrap: break-word;">
+                                        <h4><p style="text-align: center;"><strong>{{userState.totalTodosCompleted}}</strong></p></h4>                   
+                                        <p> <small class="label label-warning">Todos completed</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    </div>
-</div>
 </div>

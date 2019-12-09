@@ -5,6 +5,8 @@ import { Category } from 'src/app/models/category.model';
 import { Day, Todo } from 'src/app/models/day.model';
 import * as moment from 'moment';
 import { EventModel } from 'src/app/models/event-model.model';
+import { UserState } from 'src/app/models/user-state.model';
+import { AppUser } from 'src/app/models/app-user.model';
 
 export const selectState = (state: BaseState): AppState => state.appState;
 
@@ -57,4 +59,24 @@ export const selectEvents = createSelector(
 export const selectTopEvents = createSelector(
     selectState,
     (app: AppState): EventModel[] => app.events.slice(0, 10)
+);
+
+export const selectUnfinished = createSelector(
+    selectState,
+    (app: AppState): Todo[] => app.unfinishedTodos
+);
+
+export const selectUserState = createSelector(
+    selectState,
+    (app: AppState): UserState => app.userState
+);
+
+export const selectUsers = createSelector(
+    selectState,
+    (app: AppState): AppUser[] => app.users
+);
+
+export const selectFriends = createSelector(
+    selectState,
+    (app: AppState): AppUser[] => app.friends
 );

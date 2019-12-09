@@ -32,7 +32,13 @@
 }
 
 .content-wrapper {
-    height: calc(100vh - 230px);
+    height: calc(70vh - 230px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.unfinished-wrapper {
+    max-height: calc(30vh);
     overflow-y: auto;
     overflow-x: hidden;
 }

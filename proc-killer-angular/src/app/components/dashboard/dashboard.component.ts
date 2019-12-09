@@ -15,7 +15,7 @@ import { logOut } from 'src/app/store/actions/app.actions';
 })
 export class DashboardComponent implements OnInit {
 
-  public activeComponent: string = "list";
+  public activeComponent: string = "profile";
 
   public actiavateComponent(component: string) {
     this.activeComponent = component;

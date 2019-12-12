@@ -1,6 +1,6 @@
 import { createReducer, on, Action, ActionReducerMap } from "@ngrx/store";
 import { initialState, AppState, BaseState } from '../state/app.state';
-import { userLoggedIn, logOut, callendarLoaded, selectDay, showAddTodoWindow, hideAddTodoWindow, dayReloaded, addTest, modifyTestData, eventsLoaded, unfinishedTodoLoaded, stateLoaded, usersLoaded, friendsLoaded } from '../actions/app.actions';
+import { userLoggedIn, logOut, callendarLoaded, selectDay, showAddTodoWindow, hideAddTodoWindow, dayReloaded, addTest, modifyTestData, eventsLoaded, unfinishedTodoLoaded, stateLoaded, usersLoaded, friendsLoaded, invitationsLoaded, userDetailsLoaded, hideAppUserDetails } from '../actions/app.actions';
 import * as moment from 'moment';
 import { Day } from 'src/app/models/day.model';
 
@@ -66,6 +66,21 @@ const _appReducer = createReducer(initialState,
     ({
         ...state,
         friends: friends
+    })),
+    on(invitationsLoaded, (state: AppState, { invitaions }) => 
+    ({
+        ...state,
+        invitations: invitaions
+    })),
+    on(userDetailsLoaded, (state: AppState, { user }) => 
+    ({
+        ...state,
+        userDetails: user
+    })),
+    on(hideAppUserDetails, (state: AppState, { }) => 
+    ({
+        ...state,
+        userDetails: null
     })),
 );
 

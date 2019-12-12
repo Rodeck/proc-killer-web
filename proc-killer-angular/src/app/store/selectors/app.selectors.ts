@@ -6,7 +6,8 @@ import { Day, Todo } from 'src/app/models/day.model';
 import * as moment from 'moment';
 import { EventModel } from 'src/app/models/event-model.model';
 import { UserState } from 'src/app/models/user-state.model';
-import { AppUser } from 'src/app/models/app-user.model';
+import { AppUser, AppUserDetails } from 'src/app/models/app-user.model';
+import { Invitation } from 'src/app/models/invitation.model';
 
 export const selectState = (state: BaseState): AppState => state.appState;
 
@@ -79,4 +80,19 @@ export const selectUsers = createSelector(
 export const selectFriends = createSelector(
     selectState,
     (app: AppState): AppUser[] => app.friends
+);
+
+export const selectInvitations = createSelector(
+    selectState,
+    (app: AppState): Invitation[] => app.invitations
+);
+
+export const selectInvitationsCount = createSelector(
+    selectState,
+    (app: AppState): number => app.invitations ? app.invitations.length : 0
+);
+
+export const selectAppUserDetails = createSelector(
+    selectState,
+    (app: AppState): AppUserDetails => app.userDetails
 );

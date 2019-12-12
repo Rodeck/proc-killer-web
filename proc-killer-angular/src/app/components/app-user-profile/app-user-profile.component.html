@@ -1,0 +1,62 @@
+<div class="modal-header">
+    <h4 class="modal-title">Details</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body p-3">
+    <div class="row" *ngIf="user$ | async as userState">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row mt-3">
+                                <div class="col">
+                                    <h3>{{userState.name}}</h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="points-container mt-3">
+                                        <img src="/assets/points.png" alt="" class="img-circle" style="width:75px;">
+                                        <p class="centered">{{userState.state.points}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p style="text-align:center;font-size: smaller;"><strong>{{userState.state.level.number}} LvL</strong></p>
+                            <div class="row justify-content-md-center">
+                                <div class="col-11">
+                                    <div class="points-container">
+                                        <div class="progress">
+                                            <div class="progress-bar" class="bg-success" [ngStyle]="getProgressBarStyle()">
+                                                <div class="progress-value">{{userState.state.level.currentExp}}/{{userState.state.level.requiredExp}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 left" style="text-align:center;overflow-wrap: break-word;">
+                                    <h4><p style="text-align: center;"><strong>{{userState.state.dailyLogins}}</strong></p></h4>           
+                                    <p><small class="label label-success">Daily logins</small></p>
+                                </div>
+                                <div class=" col-lg-4 left" style="text-align:center;overflow-wrap: break-word;">
+                                    <h4><p style="text-align: center;"><strong>{{userState.state.weeklyLogins}}</strong></p></h4>                   
+                                    <p> <small class="label label-warning">Weekly logins</small></p>
+                                </div>
+                                <div class=" col-lg-4 left" style="text-align:center;overflow-wrap: break-word;">
+                                    <h4><p style="text-align: center;"><strong>{{userState.state.totalTodosCompleted}}</strong></p></h4>                   
+                                    <p> <small class="label label-warning">Todos completed</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="activeModal.dismiss('Cross click')">Close</button>
+</div>

@@ -37,6 +37,7 @@ import { ListComponent } from './components/list/list.component';
 import { AddTodoComponent } from './components/add-todo/add-todo.component';
 import { EventsComponent } from './components/events/events.component';
 import { FriendsComponent } from './components/friends/friends.component';
+import { AppUserProfileComponent } from './components/app-user-profile/app-user-profile.component';
 
 
 @NgModule({
@@ -51,7 +52,8 @@ import { FriendsComponent } from './components/friends/friends.component';
     ListComponent,
     AddTodoComponent,
     EventsComponent,
-    FriendsComponent
+    FriendsComponent,
+    AppUserProfileComponent
   ],
   imports: [
     BrowserModule,
@@ -79,7 +81,7 @@ import { FriendsComponent } from './components/friends/friends.component';
     },
   ],
   bootstrap: [AppComponent],
-  entryComponents: [ AddTodoComponent ]
+  entryComponents: [ AddTodoComponent, AppUserProfileComponent ]
 })
 
 export class AppModule { }

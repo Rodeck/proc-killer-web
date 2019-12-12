@@ -14,7 +14,8 @@ import { userLoggedIn } from 'src/app/store/actions/app.actions';
 import { selectAppState } from 'src/app/store/selectors/app.selectors';
 import { UserRegistration } from 'src/app/models/user-registration.model';
 import { UserState } from 'src/app/models/user-state.model';
-import { AppUser } from 'src/app/models/app-user.model';
+import { AppUser, AppUserDetails } from 'src/app/models/app-user.model';
+import { Invitation } from 'src/app/models/invitation.model';
 
 @Injectable({
   providedIn: 'root'
@@ -221,5 +222,33 @@ export class AuthService {
 
   getFriends(): Observable<AppUser[]> {
     return this.http.get<AppUser[]>(this.url + '/getFriends');
+  }
+
+  inviteUser(invitedId: string): Observable<number> {
+    return this.http.post<number>(this.url + '/addInvitation', {
+      invitedId: invitedId
+    });
+  }
+
+  getInvitations(): Observable<Invitation[]> {
+    return this.http.get<Invitation[]>(this.url + '/getInvitations');
+  }
+
+  acceptInvitation(invitationId: number, inviterId: string): Observable<number> {
+    return this.http.post<number>(this.url + '/acceptInvitation', {
+      inviterId: inviterId,
+      invitationId: invitationId
+    });
+  }
+
+  rejectInvitation(invitationId: number, inviterId: string): Observable<number> {
+    return this.http.post<number>(this.url + '/rejectInvitation', {
+      inviterId: inviterId,
+      invitationId: invitationId
+    });
+  }
+
+  getUserDetails(userId: string): Observable<AppUserDetails> {
+    return this.http.get<AppUserDetails>(this.url + '/getUserDetails/'+ userId);
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { createEffect, Actions, ofType } from "@ngrx/effects";
-import { userLoggedIn, logOut, loadCallendar, callendarLoaded, addTodo, hideAddTodoWindow, reloadDay, dayReloaded, completeTodo, loadEvents, eventsLoaded, loadUnfinished, unfinishedTodoLoaded, completeOverdueTodo, authenticate, loadState, stateLoaded, loadUsers, usersLoaded, loadFriends, friendsLoaded } from '../actions/app.actions';
+import { createEffect, Actions, ofType, act } from "@ngrx/effects";
+import { userLoggedIn, logOut, loadCallendar, callendarLoaded, addTodo, hideAddTodoWindow, reloadDay, dayReloaded, completeTodo, loadEvents, eventsLoaded, loadUnfinished, unfinishedTodoLoaded, completeOverdueTodo, authenticate, loadState, stateLoaded, loadUsers, usersLoaded, loadFriends, friendsLoaded, inviteFriend, loadInvitations, invitationsLoaded, acceptInvitation, rejectInvitation, showAppUserDetails, userDetailsLoaded } from '../actions/app.actions';
 import { mergeMap, tap, map, catchError, concatMap } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState, BaseState } from '../state/app.state';
@@ -148,6 +148,7 @@ export class AppEffects {
                 this.store.dispatch(loadUnfinished());
                 this.store.dispatch(loadUsers());
                 this.store.dispatch(loadFriends());
+                this.store.dispatch(loadInvitations());
             })
         ),
         { dispatch: false }
@@ -169,6 +170,63 @@ export class AppEffects {
             ofType(loadEvents),
             mergeMap((action) => this.todoService.loadEvents().pipe(
                 map(result => this.store.dispatch(eventsLoaded({ events: result }))),
+                catchError(() => EMPTY)
+            )
+            )),
+        { dispatch: false }
+    );
+
+    loadInvitations$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(loadInvitations),
+            mergeMap((action) => this.authService.getInvitations().pipe(
+                map(result => this.store.dispatch(invitationsLoaded({ invitaions: result }))),
+                catchError(() => EMPTY)
+            )
+            )),
+        { dispatch: false }
+    );
+
+    inviteFriend$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(inviteFriend),
+            mergeMap((action) => this.authService.inviteUser(action.invitedId).pipe(
+                map(result => this.store.dispatch(loadUsers())),
+                catchError(() => EMPTY)
+            )
+            )),
+        { dispatch: false }
+    );
+
+    acceptInvitation$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(acceptInvitation),
+            mergeMap((action) => this.authService.acceptInvitation(action.invitationId, action.inviterId).pipe(
+                map(result => this.store.dispatch(loadInvitations())),
+                map(result => this.store.dispatch(loadFriends())),
+                catchError(() => EMPTY)
+            )
+            )),
+        { dispatch: false }
+    );
+
+    showAppUserDetails$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(showAppUserDetails),
+            mergeMap((action) => this.authService.getUserDetails(action.userId).pipe(
+                map(result => this.store.dispatch(userDetailsLoaded({ user: result }))),
+                catchError(() => EMPTY)
+            )
+            )),
+        { dispatch: false }
+    );
+
+    rejectInvitation$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(rejectInvitation),
+            mergeMap((action) => this.authService.rejectInvitation(action.invitationId, action.inviterId).pipe(
+                map(result => this.store.dispatch(loadInvitations())),
+                map(result => this.store.dispatch(loadFriends())),
                 catchError(() => EMPTY)
             )
             )),

@@ -7,7 +7,8 @@ import { SerachPlaceModel } from 'src/app/models/search-place.model';
 import { Day, Todo } from 'src/app/models/day.model';
 import { EventModel } from 'src/app/models/event-model.model';
 import { UserState } from 'src/app/models/user-state.model';
-import { AppUser } from 'src/app/models/app-user.model';
+import { AppUser, AppUserDetails } from 'src/app/models/app-user.model';
+import { Invitation } from 'src/app/models/invitation.model';
 
 export const userLoggedIn = createAction('[User] Logged in', props<{ user: UserModel}>());
 export const logOut = createAction('[User] Log out');
@@ -44,4 +45,16 @@ export const usersLoaded = createAction('[User] Users loaded', props<{ users: Ap
 
 export const loadFriends = createAction('[User] Load friends');
 export const friendsLoaded = createAction('[User] Friends loaded', props<{ friends: AppUser[] }>());
+
+export const loadInvitations = createAction('[User] Load invitations');
+export const invitationsLoaded = createAction('[User] Invitations loaded', props<{ invitaions: Invitation[] }>());
+
+export const inviteFriend = createAction('[User] Invite friend', props<{ invitedId: string }>());
+
+export const acceptInvitation = createAction('[User] Accept invitation', props<{ invitationId: number, inviterId: string }>());
+export const rejectInvitation = createAction('[User] Reject invitation', props<{ invitationId: number, inviterId: string }>());
+
+export const showAppUserDetails = createAction('[User] Show user details', props<{ userId: string }>());
+export const userDetailsLoaded = createAction('[User] User details loaded', props<{ user: AppUserDetails }>());
+export const hideAppUserDetails = createAction('[User] Hide user details');
 

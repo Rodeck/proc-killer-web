@@ -16,3 +16,13 @@
 .nav-link {
     padding: 10px;
 }
+
+.wrap {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.wrap div:last-child {
+    margin-left: auto;
+}

@@ -1,0 +1,17 @@
+<div class="row">
+    <h2>Ranking</h2>
+</div>
+<div class="row">
+    <table class="table table-borderless">
+    <tbody>
+        <tr *ngFor='let place of ranking$ | async' [className]="place.uid === authService.getUid() ? 'bg-success' : ''">
+            <th scope="row">{{place.place}}</th>
+            <td>{{place.name}}</td>
+            <td>{{place.points}}</td>
+            <td class="text-right">
+                <button class="btn btn-success mr-2" (click)="showUserDetails(place.uid)"><i class="far fa-user-circle"></i>Profile</button>
+            </td>
+        </tr>
+    </tbody>
+    </table>
+</div>

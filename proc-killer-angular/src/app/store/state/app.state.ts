@@ -7,6 +7,7 @@ import { State } from '@ngrx/store';
 import { UserState } from 'src/app/models/user-state.model';
 import { AppUser, AppUserDetails } from 'src/app/models/app-user.model';
 import { Invitation } from 'src/app/models/invitation.model';
+import { RankingPlace } from 'src/app/models/ranking-place.model';
 
 export interface AppState {
     user: UserModel;
@@ -21,6 +22,7 @@ export interface AppState {
     users?: AppUser[]
     invitations?: Invitation[]
     userDetails?: AppUserDetails
+    ranking?: RankingPlace[]
 };
 
 export const initialState: AppState = retrieveState() !== null ? retrieveState() : 

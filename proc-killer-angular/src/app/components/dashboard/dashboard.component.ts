@@ -1,25 +1,25 @@
 import { Component, OnInit, NgZone } from '@angular/core';
-import { Router } from "@angular/router";
+import { Router, RouterOutlet } from "@angular/router";
 import { Observable } from 'rxjs';
 import { BaseState } from 'src/app/store/state/app.state';
 import { Store } from '@ngrx/store';
 import { logOut } from 'src/app/store/actions/app.actions';
 import { selectInvitationsCount } from 'src/app/store/selectors/app.selectors';
+import { slideInAnimation } from 'src/app/animations';
 
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
+  animations: [
+    slideInAnimation
+  ]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
 
   public activeComponent: string = "profile";
   friendsCount$: Observable<number> = this.store.select(selectInvitationsCount);
-
-  public actiavateComponent(component: string) {
-    this.activeComponent = component;
-  }
 
   logOut() {
     this.store.dispatch(logOut());
@@ -31,6 +31,8 @@ export class DashboardComponent implements OnInit {
     public store: Store<BaseState>,
   ) { }
 
-  ngOnInit() { }
+  prepareRoute(outlet: RouterOutlet) {
+    return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
+  }
 
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType, act } from "@ngrx/effects";
-import { userLoggedIn, logOut, loadCallendar, callendarLoaded, addTodo, hideAddTodoWindow, reloadDay, dayReloaded, completeTodo, loadEvents, eventsLoaded, loadUnfinished, unfinishedTodoLoaded, completeOverdueTodo, authenticate, loadState, stateLoaded, loadUsers, usersLoaded, loadFriends, friendsLoaded, inviteFriend, loadInvitations, invitationsLoaded, acceptInvitation, rejectInvitation, showAppUserDetails, userDetailsLoaded } from '../actions/app.actions';
+import { userLoggedIn, logOut, loadCallendar, callendarLoaded, addTodo, hideAddTodoWindow, reloadDay, dayReloaded, completeTodo, loadEvents, eventsLoaded, loadUnfinished, unfinishedTodoLoaded, completeOverdueTodo, authenticate, loadState, stateLoaded, loadUsers, usersLoaded, loadFriends, friendsLoaded, inviteFriend, loadInvitations, invitationsLoaded, acceptInvitation, rejectInvitation, showAppUserDetails, userDetailsLoaded, loadRanking, rankingLoaded } from '../actions/app.actions';
 import { mergeMap, tap, map, catchError, concatMap } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState, BaseState } from '../state/app.state';
@@ -138,6 +138,19 @@ export class AppEffects {
         { dispatch: false }
     );
 
+    loadRanking$ = createEffect(
+        () => this.actions$.pipe(
+            ofType(loadRanking),
+            mergeMap((action) => this.authService.getRanking().pipe(
+                concatMap(result => [
+                    this.store.dispatch(rankingLoaded({ ranking: result }))
+                ]),
+                catchError(() => EMPTY)
+            )
+            )),
+        { dispatch: false }
+    );
+
     userLogged$ = createEffect(
         () => this.actions$.pipe(
             ofType(userLoggedIn),
@@ -149,6 +162,7 @@ export class AppEffects {
                 this.store.dispatch(loadUsers());
                 this.store.dispatch(loadFriends());
                 this.store.dispatch(loadInvitations());
+                this.store.dispatch(loadRanking());
             })
         ),
         { dispatch: false }

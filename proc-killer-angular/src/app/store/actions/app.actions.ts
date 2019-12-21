@@ -9,6 +9,7 @@ import { EventModel } from 'src/app/models/event-model.model';
 import { UserState } from 'src/app/models/user-state.model';
 import { AppUser, AppUserDetails } from 'src/app/models/app-user.model';
 import { Invitation } from 'src/app/models/invitation.model';
+import { RankingPlace } from 'src/app/models/ranking-place.model';
 
 export const userLoggedIn = createAction('[User] Logged in', props<{ user: UserModel}>());
 export const logOut = createAction('[User] Log out');
@@ -42,6 +43,9 @@ export const unfinishedTodoLoaded = createAction('[Todo] Unfinished todo loaded'
 
 export const loadUsers = createAction('[User] Load users');
 export const usersLoaded = createAction('[User] Users loaded', props<{ users: AppUser[] }>());
+
+export const loadRanking = createAction('[Ranking] Load');
+export const rankingLoaded = createAction('[Ranking] Loaded', props<{ ranking: RankingPlace[] }>());
 
 export const loadFriends = createAction('[User] Load friends');
 export const friendsLoaded = createAction('[User] Friends loaded', props<{ friends: AppUser[] }>());

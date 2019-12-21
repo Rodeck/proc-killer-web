@@ -16,13 +16,14 @@ import { UserRegistration } from 'src/app/models/user-registration.model';
 import { UserState } from 'src/app/models/user-state.model';
 import { AppUser, AppUserDetails } from 'src/app/models/app-user.model';
 import { Invitation } from 'src/app/models/invitation.model';
+import { RankingPlace } from 'src/app/models/ranking-place.model';
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class AuthService {
-  userData: any; // Save logged in user data
+  userData: firebase.User; // Save logged in user data
   url: string = this.baseUrl + "Users"
 
   constructor(
@@ -40,14 +41,18 @@ export class AuthService {
       if (user) {
         this.userData = user;
         user.getIdToken().then(x => this.saveUserInLocalStorage(user, x));
-        
         JSON.parse(localStorage.getItem('user'));
+        this.redirect(user);
       } else {
         localStorage.setItem('user', null);
         localStorage.setItem('token', null)
         JSON.parse(localStorage.getItem('user'));
       }
     })
+  }
+
+  getUid(): string {
+    return this.userData.uid;
   }
 
   // Sign in with email/password
@@ -250,5 +255,9 @@ export class AuthService {
 
   getUserDetails(userId: string): Observable<AppUserDetails> {
     return this.http.get<AppUserDetails>(this.url + '/getUserDetails/'+ userId);
+  }
+
+  getRanking(): Observable<RankingPlace[]> {
+    return this.http.get<RankingPlace[]>(this.baseUrl + 'Statistics/');
   }
 }

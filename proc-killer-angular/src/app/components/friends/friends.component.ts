@@ -29,11 +29,16 @@ export class FriendsComponent implements OnInit {
     private modalService: NgbModal) {
       this.friends$.subscribe(f => {
         this.friendsList = f.length;
+        
       });
   }
 
   showUserDetails(userId: string) {
     console.log("showUserDetails");
+    this.modalService.open(AppUserProfileComponent, {size: 'xl', beforeDismiss: () => {
+      this.store.dispatch(hideAppUserDetails());
+      return true;
+    }});
     this.store.dispatch(showAppUserDetails({ userId: userId }));
   }
 
@@ -51,16 +56,6 @@ export class FriendsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.store.select(selectAppUserDetails).subscribe(x => {
-      if (x != null)
-      {
-        console.log("Open modal.");
-        this.modalService.open(AppUserProfileComponent, {size: 'xl', beforeDismiss: () => {
-          this.store.dispatch(hideAppUserDetails());
-          return true;
-        }});
-      }
-    });
   }
 
 }

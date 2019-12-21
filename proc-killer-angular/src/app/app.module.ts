@@ -7,6 +7,8 @@ import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 // App routing modules
 import { AppRoutingModule } from './shared/routing/app-routing.module';
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 // App components
 import { AppComponent } from './app.component';
 import { SignInComponent } from './components/sign-in/sign-in.component';
@@ -14,6 +16,7 @@ import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
+import { Ng2FlatpickrModule } from 'ng2-flatpickr';
 
 // Firebase services + enviorment module
 import { AngularFireModule } from "@angular/fire";
@@ -38,6 +41,7 @@ import { AddTodoComponent } from './components/add-todo/add-todo.component';
 import { EventsComponent } from './components/events/events.component';
 import { FriendsComponent } from './components/friends/friends.component';
 import { AppUserProfileComponent } from './components/app-user-profile/app-user-profile.component';
+import { RankingComponent } from './components/ranking/ranking.component';
 
 
 @NgModule({
@@ -53,7 +57,8 @@ import { AppUserProfileComponent } from './components/app-user-profile/app-user-
     AddTodoComponent,
     EventsComponent,
     FriendsComponent,
-    AppUserProfileComponent
+    AppUserProfileComponent,
+    RankingComponent
   ],
   imports: [
     BrowserModule,
@@ -67,7 +72,9 @@ import { AppUserProfileComponent } from './components/app-user-profile/app-user-
     NgbModule,
     StoreModule.forRoot(appReducers),
     EffectsModule.forRoot([AppEffects]),
-    environment.production ? [] : StoreDevtoolsModule.instrument()
+    environment.production ? [] : StoreDevtoolsModule.instrument(),
+    BrowserAnimationsModule,
+    Ng2FlatpickrModule
   ],
   providers: [AuthService, 
     {
@@ -81,7 +88,7 @@ import { AppUserProfileComponent } from './components/app-user-profile/app-user-
     },
   ],
   bootstrap: [AppComponent],
-  entryComponents: [ AddTodoComponent, AppUserProfileComponent ]
+  entryComponents: [ AddTodoComponent, AppUserProfileComponent ],
 })
 
 export class AppModule { }

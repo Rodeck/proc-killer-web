@@ -8,6 +8,7 @@ import { EventModel } from 'src/app/models/event-model.model';
 import { UserState } from 'src/app/models/user-state.model';
 import { AppUser, AppUserDetails } from 'src/app/models/app-user.model';
 import { Invitation } from 'src/app/models/invitation.model';
+import { RankingPlace } from 'src/app/models/ranking-place.model';
 
 export const selectState = (state: BaseState): AppState => state.appState;
 
@@ -95,4 +96,9 @@ export const selectInvitationsCount = createSelector(
 export const selectAppUserDetails = createSelector(
     selectState,
     (app: AppState): AppUserDetails => app.userDetails
+);
+
+export const selectRanking = createSelector(
+    selectState,
+    (app: AppState): RankingPlace[] => app.ranking
 );

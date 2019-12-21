@@ -10,18 +10,23 @@
         </div>
         <ul class="nav flex-column">
           <li class="nav-item">
-            <a class="nav-link" (click)="actiavateComponent('list')">
+            <a class="nav-link" [routerLink]="['/dashboard', { outlets: { appContent: ['tasks'] } }]">
                 <i class="fas fa-tasks"></i>Tasks
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" (click)="actiavateComponent('profile')">
+            <a class="nav-link" [routerLink]="['/dashboard', { outlets: { appContent: ['profile'] } }]">
               <i class="fas fa-user"></i>User Profile
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" (click)="actiavateComponent('friends')">
-              <i class="fas fa-user-friends"></i>Friends <span class="badge badge-secondary">{{friendsCount$ | async}}</span>
+            <a class="nav-link wrap" [routerLink]="['/dashboard', { outlets: { appContent: ['friends'] } }]">
+              <span><i class="fas fa-user-friends"></i>Friends</span> <span class="badge badge-secondary"><i class="fas fa-envelope"></i>{{friendsCount$ | async}}</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/dashboard', { outlets: { appContent: ['ranking'] } }]">
+              <i class="fas fa-trophy"></i>Ranking
             </a>
           </li>
           <!-- Calling SignOut() Api from AuthService -->
@@ -37,16 +42,8 @@
 
     <!-- Main content -->
     <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-      <div class="inner-adjust">
-        <div *ngIf="activeComponent == 'profile'">
-          <app-user-profile></app-user-profile>
-        </div>
-        <div *ngIf="activeComponent == 'list'">
-          <app-list></app-list>
-        </div>
-        <div *ngIf="activeComponent == 'friends'">
-          <app-friends></app-friends>
-        </div>
+      <div [@routeAnimations]="prepareRoute(outlet)" class="inner-adjust">
+        <router-outlet #outlet="outlet" name="appContent"></router-outlet>
       </div>
     </main>
 

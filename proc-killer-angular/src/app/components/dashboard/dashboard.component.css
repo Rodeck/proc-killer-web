@@ -26,3 +26,20 @@
 .wrap div:last-child {
     margin-left: auto;
 }
+
+.loading-indicator {
+    position: absolute;
+    z-index: 120;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.555);
+}
+
+.loading-indicator div {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: calc(50% - 100px);
+    top: calc(50% - 100px);
+    z-index: -100;
+}

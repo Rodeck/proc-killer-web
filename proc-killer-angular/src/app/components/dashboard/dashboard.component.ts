@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { BaseState } from 'src/app/store/state/app.state';
 import { Store } from '@ngrx/store';
 import { logOut } from 'src/app/store/actions/app.actions';
-import { selectInvitationsCount } from 'src/app/store/selectors/app.selectors';
+import { selectInvitationsCount, isLoading } from 'src/app/store/selectors/app.selectors';
 import { slideInAnimation } from 'src/app/animations';
 
 
@@ -20,6 +20,7 @@ export class DashboardComponent {
 
   public activeComponent: string = "profile";
   friendsCount$: Observable<number> = this.store.select(selectInvitationsCount);
+  isLoading$: Observable<boolean> = this.store.select(isLoading);
 
   logOut() {
     this.store.dispatch(logOut());

@@ -22,7 +22,9 @@ export interface AppState {
     users?: AppUser[]
     invitations?: Invitation[]
     userDetails?: AppUserDetails
-    ranking?: RankingPlace[]
+    ranking?: RankingPlace[],
+    showAddTodoWindow: boolean,
+    loadAmount: number,
 };
 
 export const initialState: AppState = retrieveState() !== null ? retrieveState() : 
@@ -30,6 +32,8 @@ export const initialState: AppState = retrieveState() !== null ? retrieveState()
     user: null,
     callendar: null,
     lastAddTodoDate: new Date(),
+    showAddTodoWindow: false,
+    loadAmount: 0,
 };
 
 export const initalBaseState: BaseState = {

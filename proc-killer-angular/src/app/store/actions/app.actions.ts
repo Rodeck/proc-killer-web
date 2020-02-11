@@ -25,7 +25,8 @@ export const stateLoaded = createAction('[User] State loaded', props<{ userState
 export const selectDay = createAction('[Callendar] Select day', props<{ date: Date}>());
 export const reloadDay = createAction('[Callendar] Reload day', props<{ date: Date}>());
 export const dayReloaded = createAction('[Callendar] Day reloaded', props<{ day: Day}>());
-export const showAddTodoWindow = createAction('[Todo] Show add window', props<{ date: Date}>());
+
+export const showAddTodoWindow = createAction('[Todo] Show add window');
 export const hideAddTodoWindow = createAction('[Todo] Hide add window');
 
 export const addTodo = createAction('[Todo] Add', props<{ date: Date, title: string, description: string}>());
@@ -52,6 +53,10 @@ export const friendsLoaded = createAction('[User] Friends loaded', props<{ frien
 
 export const loadInvitations = createAction('[User] Load invitations');
 export const invitationsLoaded = createAction('[User] Invitations loaded', props<{ invitaions: Invitation[] }>());
+
+export const loadInc = createAction('[Load] Increment');
+export const loadDec = createAction('[Load] Decrement');
+export const clearLoad = createAction('[Load] Clear load');
 
 export const inviteFriend = createAction('[User] Invite friend', props<{ invitedId: string }>());
 

@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { Day, Todo } from 'src/app/models/day.model';
-import { AppState, BaseState } from 'src/app/store/state/app.state';
+import { BaseState } from 'src/app/store/state/app.state';
 import { Store } from '@ngrx/store';
-import { selectCallendar, selectSelectedDay, selectAddTodoDate, selectCurrentWeek, lastAddTodoDate, selectCurrentDayTodos, selectUnfinished } from 'src/app/store/selectors/app.selectors';
-import { map, defaultIfEmpty } from 'rxjs/operators';
+import { selectSelectedDay, selectCurrentWeek, lastAddTodoDate, selectCurrentDayTodos, selectUnfinished, displayAddTodoWindow } from 'src/app/store/selectors/app.selectors';
+import { map, defaultIfEmpty, take, takeUntil } from 'rxjs/operators';
 import { selectDay, showAddTodoWindow, hideAddTodoWindow, completeTodo, addTest, modifyTestData, completeOverdueTodo } from 'src/app/store/actions/app.actions';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AddTodoComponent } from '../add-todo/add-todo.component';
@@ -15,8 +15,7 @@ import { DateService } from 'src/app/shared/services/date.service';
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })
-export class ListComponent implements OnInit {
-
+export class ListComponent implements OnInit, OnDestroy {
   callendar$: Observable<Day[]> = this.store.select(selectCurrentWeek);
   selectedDay$: Observable<Day> = this.store.select(selectSelectedDay);
   selectedDayTodos$: Observable<Todo[]> = this.store.select(selectCurrentDayTodos);
@@ -26,6 +25,7 @@ export class ListComponent implements OnInit {
     map(todos => todos.length > 0),
     defaultIfEmpty(false)
   );
+  unsubscribe$ = new Subject();
 
   selectDay(date: Date) {
     this.store.dispatch(hideAddTodoWindow());
@@ -38,26 +38,29 @@ export class ListComponent implements OnInit {
     private dateService: DateService,
   ) { }
 
-  ngOnInit() {
-    this.store.dispatch(selectDay({ date: new Date() }))
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
 
-    this.store.select(selectAddTodoDate).subscribe(x => {
-      if (x !== null)
+  ngOnInit() {
+
+    this.store.select(displayAddTodoWindow)
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe(x => {
+      if (x)
       {
         this.modalService.open(AddTodoComponent, {size: 'xl', beforeDismiss: () => {
           this.store.dispatch(hideAddTodoWindow());
           return true;
         }}); 
       }
-    })
-
-    this.selectedDayTodos$.subscribe(x => {
-      console.log(x);
     });
+    this.store.dispatch(selectDay({ date: new Date() }));
   }
 
   addTodo(date: Date) {
-    this.store.dispatch(showAddTodoWindow({date: date}));
+    this.store.dispatch(showAddTodoWindow());
   }
 
   toggleTodo(todo: Todo) {

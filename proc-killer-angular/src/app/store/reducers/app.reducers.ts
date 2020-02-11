@@ -1,6 +1,6 @@
 import { createReducer, on, Action, ActionReducerMap } from "@ngrx/store";
 import { initialState, AppState, BaseState } from '../state/app.state';
-import { userLoggedIn, logOut, callendarLoaded, selectDay, showAddTodoWindow, hideAddTodoWindow, dayReloaded, addTest, modifyTestData, eventsLoaded, unfinishedTodoLoaded, stateLoaded, usersLoaded, friendsLoaded, invitationsLoaded, userDetailsLoaded, hideAppUserDetails, rankingLoaded } from '../actions/app.actions';
+import { userLoggedIn, logOut, callendarLoaded, selectDay, showAddTodoWindow, hideAddTodoWindow, dayReloaded, addTest, modifyTestData, eventsLoaded, unfinishedTodoLoaded, stateLoaded, usersLoaded, friendsLoaded, invitationsLoaded, userDetailsLoaded, hideAppUserDetails, rankingLoaded, loadInc, loadDec, clearLoad } from '../actions/app.actions';
 import * as moment from 'moment';
 import { Day } from 'src/app/models/day.model';
 
@@ -25,15 +25,15 @@ const _appReducer = createReducer(initialState,
         ...state,
         selectedDay: state.callendar ? state.callendar.find(d => moment(d.date).isSame(moment(date), 'day')) : null
     })),
-    on(showAddTodoWindow, (state: AppState, { date }) => 
+    on(showAddTodoWindow, (state: AppState, { }) => 
     ({
         ...state,
-        addTodoDate: date
+        showAddTodoWindow: true
     })),
     on(hideAddTodoWindow, (state: AppState, { }) => 
     ({
         ...state,
-        addTodoDate: null
+        showAddTodoWindow: false
     })),
     on(dayReloaded, (state: AppState, { day }) => 
     ({
@@ -47,7 +47,7 @@ const _appReducer = createReducer(initialState,
         ...state,
         events: events
     })),
-    on(unfinishedTodoLoaded, (state: AppState, { todos }) => 
+    on(unfinishedTodoLoaded, (state: AppState, { todos }) =>
     ({
         ...state,
         unfinishedTodos: todos
@@ -86,6 +86,21 @@ const _appReducer = createReducer(initialState,
     ({
         ...state,
         ranking: ranking
+    })),
+    on(loadInc, (state: AppState, { }) => 
+    ({
+        ...state,
+        loadAmount: state.loadAmount ? state.loadAmount + 1 : 1
+    })),
+    on(loadDec, (state: AppState, { }) => 
+    ({
+        ...state,
+        loadAmount: state.loadAmount ? state.loadAmount - 1 : 0
+    })),
+    on(clearLoad, (state: AppState, { }) => 
+    ({
+        ...state,
+        loadAmount: 0
     })),
 );
 

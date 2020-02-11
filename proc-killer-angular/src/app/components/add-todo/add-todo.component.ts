@@ -3,9 +3,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { AppState, BaseState } from 'src/app/store/state/app.state';
 import { Store } from '@ngrx/store';
-import { selectAddTodoDate } from 'src/app/store/selectors/app.selectors';
+import { selectAddTodoDate, selectSelectedDay, selectSelectedDayDate } from 'src/app/store/selectors/app.selectors';
 import { DateService } from 'src/app/shared/services/date.service';
-import { addTodo } from 'src/app/store/actions/app.actions';
+import { addTodo, hideAddTodoWindow } from 'src/app/store/actions/app.actions';
 
 @Component({
   selector: 'app-add-todo',
@@ -14,9 +14,10 @@ import { addTodo } from 'src/app/store/actions/app.actions';
 })
 export class AddTodoComponent implements OnInit {
 
-  date$: Observable<Date> = this.store.select(selectAddTodoDate);
+  date$: Observable<Date> = this.store.select(selectSelectedDayDate);
   title: string = '';
   description: string = '';
+  isImportant = false;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -27,12 +28,18 @@ export class AddTodoComponent implements OnInit {
   ngOnInit() {
   }
 
+  toggleImportant() {
+    this.isImportant = !this.isImportant;
+  }
+
   addTodo(date: Date) {
-      this.store.dispatch(addTodo({ 
-      date: date, 
-      title: this.title,
-      description: this.description
+    this.store.dispatch(addTodo({ 
+        date: date, 
+        title: this.title,
+        description: this.description
     }));
+    this.store.dispatch(hideAddTodoWindow());
+    this.activeModal.dismiss();
   }
 
 }

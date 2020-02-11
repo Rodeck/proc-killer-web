@@ -43,6 +43,21 @@ export const selectSelectedDay = createSelector(
     (app: AppState): Day => app.selectedDay
 );
 
+export const isLoading = createSelector(
+    selectState,
+    (app: AppState): boolean => app.loadAmount ? app.loadAmount > 0 : false
+);
+
+export const selectSelectedDayDate = createSelector(
+    selectState,
+    (app: AppState): Date => app.selectedDay ? app.selectedDay.date : null
+);
+
+export const displayAddTodoWindow = createSelector(
+    selectState,
+    (app: AppState): boolean => app.showAddTodoWindow ? app.showAddTodoWindow : false
+);
+
 export const selectAddTodoDate = createSelector(
     selectState,
     (app: AppState): Date => app.addTodoDate
@@ -60,7 +75,9 @@ export const selectEvents = createSelector(
 
 export const selectTopEvents = createSelector(
     selectState,
-    (app: AppState): EventModel[] => app.events.slice(0, 10)
+    (app: AppState): EventModel[] => app.events.sort((a, b) => { 
+        return new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime()
+    }).slice(0, 10)
 );
 
 export const selectUnfinished = createSelector(

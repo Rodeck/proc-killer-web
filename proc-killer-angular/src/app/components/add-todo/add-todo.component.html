@@ -13,7 +13,9 @@
                     <input type="email" class="form-control" id="title" placeholder="Title" [(ngModel)]="title">
                 </div>
                 <div class="col-1">
-                    <i class="far fa-star large-icon"></i>
+                    <div class="important-container">
+                        <i class="fas fa-exclamation-circle" [ngClass]="{ 'unchecked': !isImportant, 'checked': isImportant }" data-toggle="tooltip" data-placement="top" title="Mark as important" (click)="toggleImportant()"></i>
+                    </div>
                 </div>
             </div>
             <div class="form-group">

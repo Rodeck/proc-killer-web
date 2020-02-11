@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType, act } from "@ngrx/effects";
-import { userLoggedIn, logOut, loadCallendar, callendarLoaded, addTodo, hideAddTodoWindow, reloadDay, dayReloaded, completeTodo, loadEvents, eventsLoaded, loadUnfinished, unfinishedTodoLoaded, completeOverdueTodo, authenticate, loadState, stateLoaded, loadUsers, usersLoaded, loadFriends, friendsLoaded, inviteFriend, loadInvitations, invitationsLoaded, acceptInvitation, rejectInvitation, showAppUserDetails, userDetailsLoaded, loadRanking, rankingLoaded } from '../actions/app.actions';
-import { mergeMap, tap, map, catchError, concatMap } from 'rxjs/operators';
+import { userLoggedIn, logOut, loadCallendar, callendarLoaded, addTodo, hideAddTodoWindow, reloadDay, dayReloaded, completeTodo, loadEvents, eventsLoaded, loadUnfinished, unfinishedTodoLoaded, completeOverdueTodo, authenticate, loadState, stateLoaded, loadUsers, usersLoaded, loadFriends, friendsLoaded, inviteFriend, loadInvitations, invitationsLoaded, acceptInvitation, rejectInvitation, showAppUserDetails, userDetailsLoaded, loadRanking, rankingLoaded, loadInc, loadDec, clearLoad } from '../actions/app.actions';
+import { mergeMap, tap, map, catchError, concatMap, switchMap } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState, BaseState } from '../state/app.state';
 import { EMPTY } from 'rxjs';
@@ -15,7 +15,10 @@ export class AppEffects {
         () => this.actions$.pipe(
             ofType(loadCallendar),
             mergeMap((action) => this.todoService.loadCallendar().pipe(
-                map(result => this.store.dispatch(callendarLoaded({ callendar: result }))),
+                concatMap(result => [
+                    this.store.dispatch(callendarLoaded({ callendar: result })),
+                    this.store.dispatch(loadDec())
+                ]),
                 catchError(() => EMPTY)
             )
             )),
@@ -26,7 +29,10 @@ export class AppEffects {
         () => this.actions$.pipe(
             ofType(loadUnfinished),
             mergeMap((action) => this.todoService.loadUnfinished().pipe(
-                map(result => this.store.dispatch(unfinishedTodoLoaded({ todos: result }))),
+                concatMap(result => [
+                    this.store.dispatch(unfinishedTodoLoaded({ todos: result })),
+                    this.store.dispatch(loadDec())
+                ]),
                 catchError(() => EMPTY)
             )
             )),
@@ -77,7 +83,8 @@ export class AppEffects {
             ofType(completeOverdueTodo),
             mergeMap((action) => this.todoService.completeOverdueTodo(action.id).pipe(
                 concatMap(result => [
-                    this.store.dispatch(loadUnfinished())
+                    this.store.dispatch(loadUnfinished()),
+                    this.store.dispatch(loadInc())
                 ]),
                 catchError(() => EMPTY)
             )
@@ -90,7 +97,8 @@ export class AppEffects {
             ofType(authenticate),
             mergeMap((action) => this.authService.authenticate().pipe(
                 concatMap(result => [
-                    this.store.dispatch(loadState())
+                    this.store.dispatch(loadDec()),
+                    this.store.dispatch(loadState()),
                 ]),
                 catchError(() => EMPTY)
             )
@@ -104,7 +112,8 @@ export class AppEffects {
             ofType(loadState),
             mergeMap((action) => this.authService.loadState().pipe(
                 concatMap(result => [
-                    this.store.dispatch(stateLoaded({ userState: result }))
+                    this.store.dispatch(loadDec()),
+                    this.store.dispatch(stateLoaded({ userState: result })),
                 ]),
                 catchError(() => EMPTY)
             )
@@ -117,7 +126,8 @@ export class AppEffects {
             ofType(loadUsers),
             mergeMap((action) => this.authService.loadUsers().pipe(
                 concatMap(result => [
-                    this.store.dispatch(usersLoaded({ users: result }))
+                    this.store.dispatch(usersLoaded({ users: result })),
+                    this.store.dispatch(loadDec())
                 ]),
                 catchError(() => EMPTY)
             )
@@ -130,7 +140,8 @@ export class AppEffects {
             ofType(loadFriends),
             mergeMap((action) => this.authService.getFriends().pipe(
                 concatMap(result => [
-                    this.store.dispatch(friendsLoaded({ friends: result }))
+                    this.store.dispatch(friendsLoaded({ friends: result })),
+                    this.store.dispatch(loadDec())
                 ]),
                 catchError(() => EMPTY)
             )
@@ -143,7 +154,8 @@ export class AppEffects {
             ofType(loadRanking),
             mergeMap((action) => this.authService.getRanking().pipe(
                 concatMap(result => [
-                    this.store.dispatch(rankingLoaded({ ranking: result }))
+                    this.store.dispatch(rankingLoaded({ ranking: result })),
+                    this.store.dispatch(loadDec())
                 ]),
                 catchError(() => EMPTY)
             )
@@ -154,17 +166,33 @@ export class AppEffects {
     userLogged$ = createEffect(
         () => this.actions$.pipe(
             ofType(userLoggedIn),
-            tap(() => {
+            tap(_ => {
+                this.store.dispatch(clearLoad());
+
+                this.store.dispatch(loadInc());
                 this.store.dispatch(authenticate());
+
+                this.store.dispatch(loadInc());
                 this.store.dispatch(loadCallendar());
-                this.store.dispatch(loadEvents());
+
+                this.store.dispatch(loadInc());
+                this.store.dispatch(loadEvents()),
+
+                this.store.dispatch(loadInc());
                 this.store.dispatch(loadUnfinished());
+
+                this.store.dispatch(loadInc());
                 this.store.dispatch(loadUsers());
+
+                this.store.dispatch(loadInc());
                 this.store.dispatch(loadFriends());
+
+                this.store.dispatch(loadInc());
                 this.store.dispatch(loadInvitations());
+
+                this.store.dispatch(loadInc());
                 this.store.dispatch(loadRanking());
-            })
-        ),
+            })),
         { dispatch: false }
     );
 
@@ -173,6 +201,7 @@ export class AppEffects {
         () => this.actions$.pipe(
             ofType(logOut),
             tap(() => {
+                this.store.dispatch(clearLoad());
                 this.authService.SignOut();
             })
         ),
@@ -183,7 +212,10 @@ export class AppEffects {
         () => this.actions$.pipe(
             ofType(loadEvents),
             mergeMap((action) => this.todoService.loadEvents().pipe(
-                map(result => this.store.dispatch(eventsLoaded({ events: result }))),
+                switchMap(result => [
+                    this.store.dispatch(eventsLoaded({ events: result })),
+                    this.store.dispatch(loadDec()),
+                ]),
                 catchError(() => EMPTY)
             )
             )),

@@ -11,3 +11,39 @@
 .title-wrapper {
     margin-bottom: 5px;
 }
+
+.important-container
+{
+    text-align: center;
+    margin-right: 30px;
+    vertical-align: middle;
+}
+
+.important-container i
+{
+    font-size: 250%;
+    cursor: pointer;
+    transition: font-size 0.5s;
+}
+
+.important-container i.unchecked:hover
+{
+    font-size: 270%;
+    color: rgb(95, 196, 70);
+}
+
+.important-container i.checked:hover
+{
+    font-size: 270%;
+    color: rgb(196, 70, 70);
+}
+
+.important-container i.checked
+{
+    color: rgb(95, 196, 70);
+}
+
+.important-container i.unchecked
+{
+    color: black;
+}

@@ -6,6 +6,29 @@
     border-right: 2px solid;
 }
 
+.add-button:hover {
+    box-shadow: 0 0 0 4px rgb(172, 188, 202);
+	transition: background 0.2s, color 0.2s;
+}
+
+.add-button:hover {
+    background: rgba(255,255,255,1);
+	color: #64bb5d;
+}
+
+.add-button:hover:before {
+	animation: spinAround 2s linear infinite;
+}
+
+@keyframes spinAround {
+	from {
+		transform: rotate(0deg)
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 .inline-link {
     cursor: pointer;
     color: rgb(128, 180, 128);
